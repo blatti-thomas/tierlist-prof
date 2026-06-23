@@ -3,7 +3,7 @@
 //  Inscription ouverte : chacun crée son propre compte.
 // ============================================================
 
-import { auth } from "./firebase-config.js?v=5";
+import { auth } from "./firebase-config.js?v=6";
 import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword,
   signOut, onAuthStateChanged, updateProfile

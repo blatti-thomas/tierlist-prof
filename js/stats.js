@@ -5,8 +5,8 @@
 //  (N-1-i)/(N-1) → haut = 1, bas = 0. Moyenne sur tous les boards.
 // ============================================================
 
-import { loadAllBoards } from "./store.js?v=5";
-import { escapeHtml } from "./util.js?v=5";
+import { loadAllBoards } from "./store.js?v=6";
+import { escapeHtml } from "./util.js?v=6";
 
 export function initStats() {
   document.getElementById("openStatsBtn").onclick = openStats;

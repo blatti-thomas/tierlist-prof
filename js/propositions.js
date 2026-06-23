@@ -5,8 +5,8 @@
 //  propose ce qui manque dans le tien ; tu acceptes en 1 clic.
 // ============================================================
 
-import { getState, commitBoard, loadAllBoards, uid } from "./store.js?v=5";
-import { escapeHtml, icon } from "./util.js?v=5";
+import { getState, commitBoard, loadAllBoards, uid } from "./store.js?v=6";
+import { escapeHtml, icon } from "./util.js?v=6";
 
 let lastBoards = [];
 
@@ -46,6 +46,7 @@ function render() {
 
   lastBoards.forEach(bd => {
     if (bd.uid === myUid) return;                 // pas mes propres ajouts
+    const who = bd.displayName || "Quelqu'un";
     const branches = bd.branches || [];
 
     (bd.professors || []).forEach(p => {
@@ -53,7 +54,7 @@ function render() {
       if (!p.name || myProfs.has(k)) return;
       const br = branches.find(b => b.id === p.branchId);
       const cur = profMap.get(k) || { name: p.name.trim(), branchName: br ? br.name : "", by: new Set() };
-      cur.by.add(bd.uid);
+      cur.by.add(who);
       profMap.set(k, cur);
     });
 
@@ -61,7 +62,7 @@ function render() {
       const k = norm(b.name);
       if (!b.name || myBranches.has(k)) return;
       const cur = branchMap.get(k) || { name: b.name.trim(), by: new Set() };
-      cur.by.add(bd.uid);
+      cur.by.add(who);
       branchMap.set(k, cur);
     });
 
@@ -69,7 +70,7 @@ function render() {
       const k = norm(r.label);
       if (!r.label || myRanks.has(k)) return;
       const cur = rankMap.get(k) || { label: r.label.trim(), color: r.color || "#cccccc", by: new Set() };
-      cur.by.add(bd.uid);
+      cur.by.add(who);
       rankMap.set(k, cur);
     });
   });
@@ -101,30 +102,43 @@ function renderSection(containerId, items, type) {
     const row = document.createElement("div");
     row.className = "prop-item";
 
-    const info = document.createElement("span");
+    const info = document.createElement("div");
     info.className = "prop-info";
+
+    const nameLine = document.createElement("div");
+    nameLine.className = "prop-name";
     if (type === "rank") {
       const sw = document.createElement("span");
       sw.className = "prop-swatch";
       sw.style.background = it.color;
-      info.appendChild(sw);
+      nameLine.appendChild(sw);
     }
     const label = type === "rank" ? it.label : it.name;
     const sub = (type === "prof" && it.branchName) ? "  ·  " + it.branchName : "";
-    info.appendChild(document.createTextNode(label + sub));
+    nameLine.appendChild(document.createTextNode(label + sub));
 
-    const by = document.createElement("span");
+    const by = document.createElement("div");
     by.className = "prop-by";
-    by.textContent = "par " + it.by.size;
+    by.textContent = proposersText(it.by);
+
+    info.append(nameLine, by);
 
     const add = document.createElement("button");
-    add.className = "btn btn-primary btn-sm";
+    add.className = "btn btn-primary btn-sm prop-add";
     add.append(icon("add"));
+    add.append(document.createTextNode(" Ajouter"));
     add.onclick = () => { addItem(type, it); render(); };
 
-    row.append(info, by, add);
+    row.append(info, add);
     c.appendChild(row);
   });
+}
+
+// "Proposé par Alice, Bob (+3)"
+function proposersText(namesSet) {
+  const arr = [...namesSet];
+  if (arr.length <= 3) return "Proposé par " + arr.join(", ");
+  return "Proposé par " + arr.slice(0, 3).join(", ") + " (+" + (arr.length - 3) + ")";
 }
 
 function addItem(type, it) {

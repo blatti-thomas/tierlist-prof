@@ -2,14 +2,14 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState, getState, setDisplayName } from "./store.js?v=5";
-import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=5";
-import { renderApp } from "./tierlist.js?v=5";
-import { initAdmin, renderAdmin } from "./admin.js?v=5";
-import { initGallery } from "./galerie.js?v=5";
-import { initStats } from "./stats.js?v=5";
-import { initSuggestions } from "./propositions.js?v=5";
-import { applyTheme } from "./theme.js?v=5";
+import { initStore, onState, getState, setDisplayName } from "./store.js?v=6";
+import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=6";
+import { renderApp } from "./tierlist.js?v=6";
+import { initAdmin, renderAdmin } from "./admin.js?v=6";
+import { initGallery } from "./galerie.js?v=6";
+import { initStats } from "./stats.js?v=6";
+import { initSuggestions } from "./propositions.js?v=6";
+import { applyTheme } from "./theme.js?v=6";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");

@@ -237,7 +237,7 @@ body {
 }
 .modal.open { display: grid; place-items: start center; }
 .modal-card {
-  width: 100%; max-width: 960px;
+  width: 100%; max-width: 1120px;
   margin: 30px 0;
   background: var(--paper);
   border: var(--border);
@@ -255,7 +255,7 @@ body {
 .modal-head h2 { font-size: 1.3rem; text-shadow: 2px 2px 0 rgba(0,0,0,.25); }
 .modal-body {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 18px;
   padding: 20px;
 }
@@ -269,15 +269,19 @@ body {
 .admin-col h3 { margin-bottom: 12px; font-size: 1.1rem; }
 .admin-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
 .admin-item {
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
   background: var(--paper);
   border: 2.5px solid var(--ink);
   border-radius: 10px;
   padding: 6px;
 }
 .admin-item .ipt { flex: 1; min-width: 0; padding: 6px 8px; font-size: .9rem; }
+/* Les menus déroulants prennent toute la largeur de la ligne (texte non coupé) */
+.admin-item select.ipt { flex: 1 1 100%; }
+
 .admin-add { display: flex; gap: 6px; flex-wrap: wrap; }
 .admin-add .ipt { flex: 1; min-width: 90px; }
+.admin-add select.ipt { flex: 1 1 100%; }
 
 /* ============================================================
    RESPONSIVE

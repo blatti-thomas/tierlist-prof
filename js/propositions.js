@@ -12,6 +12,9 @@ let lastBoards = [];
 
 const norm = (s) => (s || "").trim().toLowerCase();
 
+// Catégories universelles présentes partout : on ne les propose jamais.
+const DEFAULT_RANK_LABELS = new Set(["s", "a", "b", "c", "d"]);
+
 export function initSuggestions() {
   document.getElementById("openPropsBtn").onclick = openProps;
   document.getElementById("closePropsBtn").onclick = () =>
@@ -68,7 +71,7 @@ function render() {
 
     (bd.ranks || []).forEach(r => {
       const k = norm(r.label);
-      if (!r.label || myRanks.has(k)) return;
+      if (!r.label || myRanks.has(k) || DEFAULT_RANK_LABELS.has(k)) return;
       const cur = rankMap.get(k) || { label: r.label.trim(), color: r.color || "#cccccc", by: new Set() };
       cur.by.add(who);
       rankMap.set(k, cur);

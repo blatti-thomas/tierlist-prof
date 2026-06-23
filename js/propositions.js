@@ -119,7 +119,10 @@ function renderSection(containerId, items, type) {
 
     const by = document.createElement("div");
     by.className = "prop-by";
-    by.textContent = proposersText(it.by);
+    const who = [...it.by];
+    by.textContent = "Proposé par " +
+      (who.length <= 2 ? who.join(", ") : who.slice(0, 2).join(", ") + " (+" + (who.length - 2) + ")");
+    by.title = "Proposé par " + who.join(", ");   // liste complète au survol
 
     info.append(nameLine, by);
 
@@ -134,12 +137,6 @@ function renderSection(containerId, items, type) {
   });
 }
 
-// "Proposé par Alice, Bob (+3)"
-function proposersText(namesSet) {
-  const arr = [...namesSet];
-  if (arr.length <= 3) return "Proposé par " + arr.join(", ");
-  return "Proposé par " + arr.slice(0, 3).join(", ") + " (+" + (arr.length - 3) + ")";
-}
 
 function addItem(type, it) {
   if (type === "prof") {

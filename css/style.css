@@ -388,7 +388,13 @@ body {
   gap: 6px;
   overflow-wrap: anywhere;
 }
-.prop-by { font-size: .78rem; opacity: .75; overflow-wrap: anywhere; }
+.prop-by {
+  font-size: .78rem;
+  opacity: .75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .prop-add { flex: 0 0 auto; white-space: nowrap; }
 .prop-swatch {
   width: 16px; height: 16px;

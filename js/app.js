@@ -8,7 +8,7 @@ import { renderApp } from "./tierlist.js?v=6";
 import { initAdmin, renderAdmin } from "./admin.js?v=6";
 import { initGallery } from "./galerie.js?v=6";
 import { initStats } from "./stats.js?v=6";
-import { initSuggestions } from "./propositions.js?v=6";
+import { initSuggestions } from "./propositions.js?v=7";
 import { applyTheme } from "./theme.js?v=6";
 
 const loginScreen = document.getElementById("loginScreen");

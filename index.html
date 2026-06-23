@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,0,0" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=7">
+  <link rel="stylesheet" href="css/style.css?v=8">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -183,6 +184,26 @@
       </div>
       <div class="modal-body">
         <p class="hint">Score pondéré : tient compte du <strong>nombre de personnes</strong> qui ont classé le prof (un prof noté par beaucoup de monde compte plus qu'un noté par une seule personne) et reste indépendant du nombre de catégories.</p>
+
+        <div id="statsCharts" class="stats-charts">
+          <div class="stats-chart-card">
+            <h3><span class="material-symbols-rounded">bar_chart</span> Nombre de votes par prof</h3>
+            <div class="canvas-wrap"><canvas id="chartVotes"></canvas></div>
+          </div>
+          <div class="stats-chart-card">
+            <h3><span class="material-symbols-rounded">pie_chart</span> Répartition des votes</h3>
+            <div class="canvas-wrap"><canvas id="chartPie"></canvas></div>
+          </div>
+          <div class="stats-chart-card">
+            <h3><span class="material-symbols-rounded">radar</span> Comparaison du top (toile d'araignée)</h3>
+            <div class="canvas-wrap"><canvas id="chartRadar"></canvas></div>
+          </div>
+          <div class="stats-chart-card">
+            <h3><span class="material-symbols-rounded">scatter_plot</span> Popularité vs note</h3>
+            <div class="canvas-wrap"><canvas id="chartScatter"></canvas></div>
+          </div>
+        </div>
+
         <div id="statsContent" class="stats-content"></div>
       </div>
     </div>

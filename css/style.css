@@ -405,6 +405,35 @@ body {
 }
 
 /* ---------- Statistiques ---------- */
+/* La modale stats s'empile verticalement (graphes en grille puis classement) */
+#statsModal .modal-body { display: block; }
+
+.stats-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.stats-chart-card {
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.stats-chart-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+.stats-chart-card h3 .material-symbols-rounded { font-size: 1.3rem; color: var(--primary); }
+.stats-chart-card .canvas-wrap {
+  position: relative;
+  height: 290px;
+}
+
 .stats-content {
   width: 100%;
   display: flex;

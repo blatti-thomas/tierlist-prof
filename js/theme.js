@@ -37,13 +37,11 @@ export function applyTheme(theme) {
   loadFont(t.font);
   s.setProperty("--font", `'${t.font}', system-ui, sans-serif`);
   s.setProperty("--base-size", t.baseSize + "px");
-  s.setProperty("--paper", t.bg);
   s.setProperty("--text", t.text);
   s.setProperty("--ink", t.border);
   s.setProperty("--primary", t.primary);
   s.setProperty("--accent", t.accent);
   s.setProperty("--radius", t.radius + "px");
-  s.setProperty("--tier-label-w", t.tierLabelWidth + "px");
 }
 
 function setTheme(patch) {
@@ -59,7 +57,6 @@ export function initThemeControls() {
     .map(f => `<option value="${f}">${f}</option>`).join("");
   fontSel.onchange = () => setTheme({ font: fontSel.value });
 
-  bindColor("themeBg", "bg");
   bindColor("themeText", "text");
   bindColor("themeBorder", "border");
   bindColor("themePrimary", "primary");
@@ -67,7 +64,6 @@ export function initThemeControls() {
 
   bindRange("themeSize", "baseSize");
   bindRange("themeRadius", "radius");
-  bindRange("themeTlw", "tierLabelWidth");
 
   document.getElementById("themeResetBtn").onclick = () => setTheme({ ...DEFAULT_THEME });
 }
@@ -87,17 +83,14 @@ function bindRange(id, key) {
 export function renderThemeControls(state) {
   const t = { ...DEFAULT_THEME, ...(state.theme || {}) };
   setVal("themeFont", t.font);
-  setVal("themeBg", t.bg);
   setVal("themeText", t.text);
   setVal("themeBorder", t.border);
   setVal("themePrimary", t.primary);
   setVal("themeAccent", t.accent);
   setVal("themeSize", t.baseSize);
   setVal("themeRadius", t.radius);
-  setVal("themeTlw", t.tierLabelWidth);
   setText("themeSizeVal", t.baseSize + " px");
   setText("themeRadiusVal", t.radius + " px");
-  setText("themeTlwVal", t.tierLabelWidth + " px");
 }
 
 function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }

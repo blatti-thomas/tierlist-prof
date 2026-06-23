@@ -46,8 +46,7 @@ export const DEFAULT_THEME = {
   border: "#15151e",    // couleur des contours/bordures
   primary: "#ff5d8f",   // couleur primaire (boutons principaux)
   accent: "#4ab8ff",    // couleur d'accent
-  radius: 22,           // arrondi des angles (px)
-  tierLabelWidth: 90    // largeur des étiquettes de rang (px)
+  radius: 22            // arrondi des angles (px)
 };
 
 // ============================================================

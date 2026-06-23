@@ -12,7 +12,6 @@
   --primary: #ff5d8f;        /* rose vif            */
   --accent: #4ab8ff;         /* bleu vif            */
   --radius: 22px;
-  --tier-label-w: 90px;      /* largeur étiquettes de rang */
 
   /* --- Variables fixes --- */
   --paper-2: #ffeec9;
@@ -152,16 +151,20 @@ body {
   min-height: 84px;
 }
 .tier-label {
-  flex: 0 0 var(--tier-label-w);
+  /* Largeur automatique : s'ajuste à la longueur du texte (avec garde-fous) */
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 64px;
+  max-width: 280px;
   display: grid;
   place-items: center;
-  font-size: clamp(0.8rem, 2.2vw, 1.8rem);
+  font-size: clamp(0.85rem, 2.2vw, 1.8rem);
   line-height: 1.05;
   font-weight: 700;
   color: #fff;
   text-shadow: 2px 2px 0 rgba(0,0,0,.35);
   border-right: var(--border);
-  padding: 6px;
+  padding: 8px 16px;
   overflow-wrap: anywhere;
   text-align: center;
 }
@@ -308,6 +311,8 @@ body {
   font-weight: 600;
   font-size: .9rem;
 }
+/* La légende (avec la valeur entre parenthèses) reste sur une seule ligne */
+.theme-grid label .cap { white-space: nowrap; }
 .theme-grid input[type="range"] { width: 100%; accent-color: var(--primary); }
 .theme-grid .ipt-color { width: 100%; height: 40px; }
 

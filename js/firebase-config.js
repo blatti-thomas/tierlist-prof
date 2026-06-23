@@ -20,12 +20,12 @@ export const firebaseConfig = {
 };
 
 // ------------------------------------------------------------
-//  Compte d'accès partagé.
-//  Sur la page de connexion, l'utilisateur ne tape QUE le mot de passe ;
-//  l'app se connecte automatiquement avec cet e-mail.
-//  → Crée ce compte dans Firebase : Authentication → Users → "Add user".
+//  E-mail de l'ADMINISTRATEUR.
+//  Cette personne peut modifier les profs/branches/rangs/apparence
+//  et voir les classements de tout le monde.
+//  Les autres comptes ne peuvent faire que leur propre classement.
 // ------------------------------------------------------------
-export const APP_ACCESS_EMAIL = "thomas.2048.blatti@gmail.com";
+export const ADMIN_EMAIL = "thomas.2048.blatti@gmail.com";
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

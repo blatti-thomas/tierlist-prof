@@ -1,8 +1,9 @@
 // ============================================================
 //  TIER LIST — Rendu + Glisser/Déposer (PC + tactile)
+//  Lit la config partagée et écrit dans le classement perso.
 // ============================================================
 
-import { getState, commit } from "./store.js";
+import { getState, setPlacement } from "./store.js";
 import { escapeHtml } from "./util.js";
 
 const BANK_ZONE = "__bank__";
@@ -12,18 +13,24 @@ let bankFilter = "__all__";
 //  RENDU PRINCIPAL
 // ------------------------------------------------------------
 export function renderApp() {
-  const state = getState();
-  if (!state) return;
-  renderTiers(state);
-  renderBankFilter(state);
-  renderBank(state);
+  const { config } = getState();
+  const wrap = document.getElementById("tierRows");
+  if (!config) {
+    wrap.innerHTML = `<p class="hint">⏳ En attente de la configuration par l'administrateur…</p>`;
+    document.getElementById("bank").innerHTML = "";
+    return;
+  }
+  renderTiers();
+  renderBankFilter();
+  renderBank();
 }
 
-function renderTiers(state) {
+function renderTiers() {
+  const { config, placements } = getState();
   const wrap = document.getElementById("tierRows");
   wrap.innerHTML = "";
 
-  state.ranks.forEach(rank => {
+  config.ranks.forEach(rank => {
     const row = document.createElement("div");
     row.className = "tier-row";
 
@@ -36,23 +43,24 @@ function renderTiers(state) {
     zone.className = "tier-zone dropzone";
     zone.dataset.drop = rank.id;
 
-    state.professors
-      .filter(p => state.placements[p.id] === rank.id)
-      .forEach(p => zone.appendChild(makeChip(p, state)));
+    config.professors
+      .filter(p => placements[p.id] === rank.id)
+      .forEach(p => zone.appendChild(makeChip(p)));
 
     row.append(label, zone);
     wrap.appendChild(row);
   });
 }
 
-function renderBank(state) {
+function renderBank() {
+  const { config, placements } = getState();
   const bank = document.getElementById("bank");
   bank.innerHTML = "";
   bank.classList.add("dropzone");
   bank.dataset.drop = BANK_ZONE;
 
-  const list = state.professors.filter(p =>
-    !state.placements[p.id] &&
+  const list = config.professors.filter(p =>
+    !placements[p.id] &&
     (bankFilter === "__all__" || p.branchId === bankFilter)
   );
 
@@ -62,30 +70,32 @@ function renderBank(state) {
     empty.textContent = "Aucun prof ici 🎉";
     bank.appendChild(empty);
   } else {
-    list.forEach(p => bank.appendChild(makeChip(p, state)));
+    list.forEach(p => bank.appendChild(makeChip(p)));
   }
 }
 
-function renderBankFilter(state) {
+function renderBankFilter() {
+  const { config } = getState();
   const sel = document.getElementById("bankFilter");
   const current = bankFilter;
   sel.innerHTML =
     `<option value="__all__">Toutes les branches</option>` +
-    state.branches.map(b => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join("");
+    config.branches.map(b => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join("");
 
-  bankFilter = (current === "__all__" || state.branches.some(b => b.id === current))
+  bankFilter = (current === "__all__" || config.branches.some(b => b.id === current))
     ? current : "__all__";
   sel.value = bankFilter;
 
-  sel.onchange = () => { bankFilter = sel.value; renderBank(getState()); };
+  sel.onchange = () => { bankFilter = sel.value; renderBank(); };
 }
 
-function makeChip(p, state) {
+function makeChip(p) {
+  const { config } = getState();
   const chip = document.createElement("div");
   chip.className = "chip";
   chip.dataset.prof = p.id;
 
-  const branch = state.branches.find(b => b.id === p.branchId);
+  const branch = config.branches.find(b => b.id === p.branchId);
   chip.innerHTML =
     `<span class="chip-name">${escapeHtml(p.name)}</span>` +
     (branch ? `<span class="chip-branch">${escapeHtml(branch.name)}</span>` : "");
@@ -95,22 +105,16 @@ function makeChip(p, state) {
 }
 
 // ============================================================
-//  GLISSER / DÉPOSER (pointer events → marche à la souris ET au doigt)
+//  GLISSER / DÉPOSER (pointer events → souris ET doigt)
 // ============================================================
 let drag = null;
-const THRESHOLD = 6; // px avant de considérer que c'est un drag (et non un clic)
+const THRESHOLD = 6;
 
 function startDrag(e, profId) {
   if (e.pointerType === "mouse" && e.button !== 0) return;
   drag = {
-    profId,
-    chip: e.currentTarget,
-    ghost: null,
-    active: false,
-    startX: e.clientX,
-    startY: e.clientY,
-    offsetX: 0,
-    offsetY: 0
+    profId, chip: e.currentTarget, ghost: null, active: false,
+    startX: e.clientX, startY: e.clientY, offsetX: 0, offsetY: 0
   };
   window.addEventListener("pointermove", onMove);
   window.addEventListener("pointerup", onUp);
@@ -120,12 +124,10 @@ function startDrag(e, profId) {
 
 function onMove(e) {
   if (!drag) return;
-
   if (!drag.active) {
     if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < THRESHOLD) return;
     beginGhost(e);
   }
-
   drag.ghost.style.left = (e.clientX - drag.offsetX) + "px";
   drag.ghost.style.top  = (e.clientY - drag.offsetY) + "px";
   highlightZone(e.clientX, e.clientY);
@@ -168,20 +170,15 @@ function onUp(e) {
   const d = drag;
   drag = null;
   document.querySelectorAll(".drop-hover").forEach(z => z.classList.remove("drop-hover"));
-
-  if (!d.active) return; // simple clic, rien à faire
+  if (!d.active) return;
 
   const zone = zoneAt(e.clientX, e.clientY);
   if (d.ghost) d.ghost.remove();
 
   if (zone) {
     const target = zone.dataset.drop;
-    commit(draft => {
-      if (target === BANK_ZONE) delete draft.placements[d.profId];
-      else draft.placements[d.profId] = target;
-    });
-    // renderApp() est rappelé automatiquement via onState (voir app.js)
+    setPlacement(d.profId, target === BANK_ZONE ? null : target);
   } else {
-    d.chip.classList.remove("chip-dragging"); // déposé dans le vide → on restaure
+    d.chip.classList.remove("chip-dragging");
   }
 }

@@ -316,6 +316,53 @@ body {
 .theme-grid input[type="range"] { width: 100%; accent-color: var(--primary); }
 .theme-grid .ipt-color { width: 100%; height: 40px; }
 
+/* ---------- Affichage des classements (admin) ---------- */
+.rankings-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.ranking-card {
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  box-shadow: var(--shadow-sm);
+}
+.ranking-card h4 {
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+.ranking-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ranking-label {
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid var(--ink);
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 rgba(0,0,0,.35);
+  padding: 2px;
+  font-size: .85rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.ranking-names {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-size: .85rem;
+  font-weight: 500;
+}
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */

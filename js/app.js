@@ -2,8 +2,8 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState } from "./store.js";
-import { watchAuth, login, logout } from "./auth.js";
+import { initStore, onState, getState } from "./store.js";
+import { watchAuth, login, register, logout, isAdmin } from "./auth.js";
 import { renderApp } from "./tierlist.js";
 import { initAdmin, renderAdmin } from "./admin.js";
 import { applyTheme } from "./theme.js";
@@ -11,68 +11,93 @@ import { applyTheme } from "./theme.js";
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
 const adminModal  = document.getElementById("adminModal");
+const adminBtn    = document.getElementById("openAdminBtn");
 
 let storeReady = false;
 
 function showApp()   { loginScreen.classList.add("hidden");  appScreen.classList.remove("hidden"); }
 function showLogin() { appScreen.classList.add("hidden");    loginScreen.classList.remove("hidden"); }
 
-// --- Re-render à chaque changement d'état (local OU temps réel Firestore)
+// --- Re-render à chaque changement d'état
 onState((state) => {
-  if (state) applyTheme(state.theme);
+  if (state.config) applyTheme(state.config.theme);
   renderApp();
   if (adminModal.classList.contains("open")) renderAdmin();
 });
 
 // --- Surveillance de la session
 watchAuth(
-  async () => {
+  async (user) => {
+    const admin = isAdmin(user);
+    adminBtn.classList.toggle("hidden", !admin);  // bouton Admin réservé à l'admin
     showApp();
     if (!storeReady) {
-      await initStore();   // charge / crée le doc + écoute en temps réel
+      await initStore(user, admin);
       storeReady = true;
     }
   },
-  () => showLogin()
+  () => {
+    storeReady = false;
+    showLogin();
+  }
 );
 
-// --- Connexion
+// --- Connexion / Inscription
+const emailEl = document.getElementById("email");
+const nameEl  = document.getElementById("displayName");
+const pwdEl   = document.getElementById("password");
+const errEl   = document.getElementById("loginError");
+
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const pwd = document.getElementById("password").value;
-  const err = document.getElementById("loginError");
-  err.textContent = "";
+  errEl.textContent = "";
   try {
-    await login(pwd);
-    document.getElementById("password").value = "";
+    await login(emailEl.value.trim(), pwdEl.value);
   } catch (ex) {
-    err.textContent = messageFor(ex);
-    console.error("Erreur de connexion :", ex.code, ex.message);
+    errEl.textContent = messageFor(ex);
+    console.error("Connexion :", ex.code, ex.message);
   }
 });
 
-// Traduit le code d'erreur Firebase en message clair
+document.getElementById("signupBtn").addEventListener("click", async () => {
+  errEl.textContent = "";
+  const name = nameEl.value.trim();
+  if (!name) { errEl.textContent = "Choisis un pseudo pour créer ton compte 😉"; return; }
+  try {
+    await register(emailEl.value.trim(), pwdEl.value, name);
+  } catch (ex) {
+    errEl.textContent = messageFor(ex);
+    console.error("Inscription :", ex.code, ex.message);
+  }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => logout());
+
+// Traduit les codes d'erreur Firebase en messages clairs
 function messageFor(ex) {
   switch (ex.code) {
     case "auth/invalid-credential":
     case "auth/wrong-password":
     case "auth/user-not-found":
-      return "Mot de passe incorrect ❌";
+      return "E-mail ou mot de passe incorrect ❌";
+    case "auth/email-already-in-use":
+      return "Cet e-mail a déjà un compte → connecte-toi 🙂";
+    case "auth/weak-password":
+      return "Mot de passe trop court (min. 6 caractères) ⚠️";
     case "auth/invalid-email":
-      return "E-mail d'accès invalide (vérifie firebase-config.js) ❌";
+      return "E-mail invalide ❌";
+    case "auth/missing-password":
+      return "Entre un mot de passe ⚠️";
     case "auth/operation-not-allowed":
       return "Active « E-mail/Mot de passe » dans Firebase Auth ⚠️";
     case "auth/unauthorized-domain":
-      return "Domaine non autorisé : ajoute-le dans Firebase → Auth → Settings ⚠️";
+      return "Domaine non autorisé (Firebase → Auth → Settings) ⚠️";
     case "auth/network-request-failed":
       return "Problème de réseau 📡";
     default:
       return "Erreur : " + (ex.code || ex.message);
   }
 }
-
-// --- Déconnexion
-document.getElementById("logoutBtn").addEventListener("click", () => logout());
 
 // --- Branchements du panneau admin
 initAdmin();

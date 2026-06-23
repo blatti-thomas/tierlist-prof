@@ -3,7 +3,7 @@
 //  Applique les variables CSS et gère les contrôles de l'admin.
 // ============================================================
 
-import { commit, DEFAULT_THEME } from "./store.js";
+import { commitConfig, DEFAULT_THEME } from "./store.js";
 
 // Polices proposées (clé = nom affiché, valeur = nom pour Google Fonts)
 export const FONTS = {
@@ -45,7 +45,7 @@ export function applyTheme(theme) {
 }
 
 function setTheme(patch) {
-  commit(d => { d.theme = { ...DEFAULT_THEME, ...d.theme, ...patch }; });
+  commitConfig(d => { d.theme = { ...DEFAULT_THEME, ...d.theme, ...patch }; });
 }
 
 // ------------------------------------------------------------
@@ -80,8 +80,8 @@ function bindRange(id, key) {
 // ------------------------------------------------------------
 //  Met à jour les valeurs affichées dans les contrôles
 // ------------------------------------------------------------
-export function renderThemeControls(state) {
-  const t = { ...DEFAULT_THEME, ...(state.theme || {}) };
+export function renderThemeControls(config) {
+  const t = { ...DEFAULT_THEME, ...((config && config.theme) || {}) };
   setVal("themeFont", t.font);
   setVal("themeText", t.text);
   setVal("themeBorder", t.border);

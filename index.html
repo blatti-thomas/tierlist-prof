@@ -14,12 +14,17 @@
   <!-- ============ ÉCRAN DE CONNEXION (verrouillage) ============ -->
   <section id="loginScreen" class="login-screen">
     <form id="loginForm" class="login-card">
-      <div class="login-emoji">🔒</div>
+      <div class="login-emoji">🎓</div>
       <h1 class="login-title">Tier List des Profs</h1>
-      <p class="login-sub">Entre le mot de passe pour débloquer l'app</p>
+      <p class="login-sub">Connecte-toi ou crée ton compte pour faire ton classement</p>
+      <input type="email" id="email" class="ipt ipt-lg"
+             placeholder="E-mail" autocomplete="email" required>
+      <input type="text" id="displayName" class="ipt ipt-lg"
+             placeholder="Pseudo (pour créer un compte)" autocomplete="nickname">
       <input type="password" id="password" class="ipt ipt-lg"
              placeholder="Mot de passe" autocomplete="current-password" required>
-      <button type="submit" class="btn btn-primary btn-block">Entrer 🚀</button>
+      <button type="submit" class="btn btn-primary btn-block">Se connecter 🚀</button>
+      <button type="button" id="signupBtn" class="btn btn-accent btn-block">Créer un compte ✨</button>
       <p id="loginError" class="login-error"></p>
     </form>
   </section>
@@ -29,7 +34,7 @@
     <header class="topbar">
       <h1 class="brand">🎓 Tier List des Profs</h1>
       <div class="topbar-actions">
-        <button id="openAdminBtn" class="btn btn-accent">⚙️ Admin</button>
+        <button id="openAdminBtn" class="btn btn-accent hidden">⚙️ Admin</button>
         <button id="logoutBtn" class="btn btn-ghost">Déconnexion</button>
       </div>
     </header>
@@ -111,6 +116,12 @@
             </label>
           </div>
           <button id="themeResetBtn" class="btn btn-ghost btn-sm">↺ Réinitialiser l'apparence</button>
+        </div>
+
+        <div class="admin-col admin-col-wide">
+          <h3>👥 Classements des utilisateurs</h3>
+          <button id="loadRankingsBtn" class="btn btn-accent btn-sm">🔄 Charger les classements</button>
+          <div id="adminRankings" class="rankings-view"></div>
         </div>
 
       </div>

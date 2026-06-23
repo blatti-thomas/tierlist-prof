@@ -1,77 +1,90 @@
 # 🎓 Tier List des Profs
 
-Application web statique (HTML/CSS/JS) pour créer une **tier list paramétrable** de professeurs,
-au style **cartoon**, avec connexion par mot de passe, drag & drop, et sauvegarde temps réel
-sur **Firebase / Cloud Firestore**. Hébergeable gratuitement sur **GitHub Pages**.
+Une petite application web (100 % front-end) pour faire, **entre potes**, des *tier lists* de
+profs façon « S / A / B / C / D ». Chacun se crée un compte, classe les profs en glisser-déposer,
+personnalise ses catégories et son thème, et peut voir les classements des autres dans une galerie.
+
+> Projet perso fait pour s'amuser et apprendre (HTML/CSS/JS + Firebase + GitHub Pages).
+
+---
+
+## ⚠️ Disclaimer (à lire avant de rigoler)
+
+Ce site est un **projet à but purement humoristique et récréatif**, créé pour s'amuser entre
+camarades. Les classements n'ont **aucune valeur officielle**, n'expriment **aucun jugement
+sérieux** sur les compétences ou la personne des enseignant·e·s, et ne reflètent que des
+**opinions subjectives et bon enfant**.
+
+- Ce n'est **ni une évaluation**, ni un avis officiel, ni un outil affilié à un établissement.
+- Je **déplore et désapprouve formellement tout débordement** : insultes, harcèlement, propos
+  diffamatoires, moqueries déplacées ou toute utilisation malveillante. Ce n'est **pas** l'esprit
+  du projet.
+- En cas de demande légitime d'une personne concernée, le contenu peut être **retiré sans délai**.
+
+Bref : **c'est pour rire, on reste respectueux.** 🙏
+
+---
 
 ## ✨ Fonctionnalités
-- 🔒 Page de connexion par mot de passe (Firebase Auth)
-- 🧲 Glisser-déposer des profs depuis une "banque" vers les rangs (PC **et** mobile)
-- ⚙️ Panneau d'admin : ajout/modif/suppression des profs, branches et rangs (label, couleur, ordre)
-- ☁️ Sauvegarde automatique + synchro temps réel entre appareils
-- 🎨 Design cartoon responsive
+
+- 🔐 Comptes individuels (e-mail + mot de passe)
+- 🧲 Tier list en glisser-déposer (PC **et** mobile), avec ordre précis dans chaque rang
+- 🛠️ Panneau perso : ajouter/modifier profs, cours et catégories, changer les couleurs
+- 🎨 Personnalisation de l'apparence (police, taille, couleurs, arrondis)
+- 🌍 Galerie : voir les tier lists de tout le monde
+- 📊 Statistiques : les profs les mieux classés (score normalisé, indépendant du nombre de catégories)
+- 📥 Propositions : importer les profs/cours/catégories ajoutés par les autres, sans doublons
+- 👤 Pseudo modifiable à tout moment
 
 ---
 
-## 1) Configurer Firebase (étape par étape)
+## 🧰 Stack technique
 
-1. Va sur **https://console.firebase.google.com** → **Ajouter un projet** → donne un nom → crée-le.
-2. **Authentication** : menu de gauche → *Authentication* → *Get started* →
-   onglet *Sign-in method* → active **E-mail/Mot de passe** → *Enregistrer*.
-3. **Crée le compte d'accès** : onglet *Users* → *Add user* →
-   - E-mail : `thomas.2048.blatti@gmail.com` (le même que `APP_ACCESS_EMAIL` dans `js/firebase-config.js`)
-   - Mot de passe : celui que tu taperas sur la page de connexion → *Add user*.
-4. **Firestore** : menu de gauche → *Firestore Database* → *Create database* →
-   choisis un emplacement (ex. `eur3`) → démarre en mode **production**.
-5. **Règles de sécurité** : onglet *Rules* → colle le contenu de `firestore.rules` → *Publier*.
-6. **Récupère ta config** : ⚙️ *Paramètres du projet* → section *Tes applications* →
-   icône **Web `</>`** → enregistre l'app → copie l'objet `firebaseConfig = { ... }`.
-7. Colle cet objet dans **`js/firebase-config.js`** (remplace les `VOTRE_...`).
-
-> Au tout premier lancement, l'app crée automatiquement le document `tierlists/main`
-> avec des **profs de test en Mécatronique**.
+- **Front-end** : HTML, CSS, JavaScript modulaire (ES modules), icônes Material Symbols
+- **Back-end** : [Firebase](https://firebase.google.com/) — Authentication + Cloud Firestore
+- **Hébergement** : GitHub Pages (site statique)
 
 ---
 
-## 2) Tester en local
+## 🚀 Déployer ta propre version
 
-> Les modules ES (`import`) ne fonctionnent pas en `file://` : il faut un petit serveur.
+1. Crée un projet sur la [console Firebase](https://console.firebase.google.com).
+2. Active **Authentication → E-mail/Mot de passe**.
+3. Crée une base **Cloud Firestore** (mode production).
+4. Copie tes règles depuis [`firestore.rules`](firestore.rules) → onglet *Rules* → **Publier**.
+5. Récupère ton objet `firebaseConfig` (⚙️ *Paramètres du projet → Tes applications → Web*).
+6. Colle-le dans [`js/firebase-config.js`](js/firebase-config.js).
+7. Pousse le tout sur un dépôt GitHub → *Settings → Pages → Deploy from a branch* (`main` / `root`).
+8. Dans Firebase → *Authentication → Settings → Authorized domains*, ajoute ton domaine `…github.io`.
 
-```bash
-# Python
-python -m http.server 5500
-# ou Node
-npx serve
-```
-Puis ouvre `http://localhost:5500`.
-
----
-
-## 3) Déployer sur GitHub Pages
-
-1. Crée un dépôt GitHub et pousse tout le contenu de ce dossier.
-2. Dépôt → *Settings* → *Pages* → *Build and deployment* → Source : **Deploy from a branch** →
-   Branche : `main` / dossier `/ (root)` → *Save*.
-3. Ton site sera dispo sur `https://<utilisateur>.github.io/<repo>/`.
-4. Dans Firebase → *Authentication* → *Settings* → *Authorized domains* →
-   ajoute ton domaine `…github.io`.
+> 💡 **À propos de `firebaseConfig`** : ces clés sont **publiques par conception** dans toute app web
+> Firebase (elles identifient le projet, ce ne sont pas des secrets). Ce qui protège réellement les
+> données, ce sont les **règles Firestore** (qui exigent d'être connecté). N'y mets donc aucune
+> donnée sensible.
 
 ---
 
 ## 📁 Structure
 
 ```
-Tierlist-prof/
-├─ index.html
-├─ css/style.css
-├─ js/
-│  ├─ firebase-config.js   ← ⚠️ ta config Firebase ici
-│  ├─ store.js             ← état + synchro Firestore + données de test
-│  ├─ auth.js              ← connexion / déconnexion
-│  ├─ tierlist.js          ← rendu + drag & drop
-│  ├─ admin.js             ← panneau d'administration (CRUD)
-│  ├─ util.js
-│  └─ app.js               ← point d'entrée
-├─ firestore.rules         ← règles de sécurité à copier dans Firebase
-└─ README.md
+index.html              page unique (connexion + app + modales)
+css/style.css           styles (thème "cartoon")
+js/
+  firebase-config.js    config Firebase (à remplacer par la tienne)
+  store.js              état + Firestore (1 board par utilisateur)
+  auth.js               connexion / inscription
+  tierlist.js           rendu + glisser-déposer
+  admin.js              éditeur de son board
+  theme.js              personnalisation de l'apparence
+  galerie.js            galerie commune
+  stats.js              statistiques
+  propositions.js       import des ajouts des autres
+  app.js                point d'entrée
+firestore.rules         règles de sécurité Firestore
 ```
+
+---
+
+## 📄 Licence
+
+Projet personnel, fourni « tel quel », à but éducatif et récréatif.

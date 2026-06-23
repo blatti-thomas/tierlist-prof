@@ -19,14 +19,6 @@ export const firebaseConfig = {
   measurementId: "G-KTRXRPT797"
 };
 
-// ------------------------------------------------------------
-//  E-mail de l'ADMINISTRATEUR.
-//  Cette personne peut modifier les profs/branches/rangs/apparence
-//  et voir les classements de tout le monde.
-//  Les autres comptes ne peuvent faire que leur propre classement.
-// ------------------------------------------------------------
-export const ADMIN_EMAIL = "thomas.2048.blatti@gmail.com";
-
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);

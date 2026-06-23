@@ -83,7 +83,8 @@ let state = {
   isAdmin: false,
   displayName: "",
   uid: null,
-  ready: false
+  ready: false,
+  error: null
 };
 
 const listeners = new Set();
@@ -105,9 +106,16 @@ export async function initStore(user, admin) {
     || (user.email ? user.email.split("@")[0] : "Utilisateur");
 
   // ---------- CONFIG partagée ----------
-  const snap = await getDoc(CONFIG_REF);
-  if (!snap.exists() && admin) {
-    await setDoc(CONFIG_REF, { ...DEFAULT_CONFIG, updatedAt: serverTimestamp() });
+  try {
+    const snap = await getDoc(CONFIG_REF);
+    if (!snap.exists() && admin) {
+      await setDoc(CONFIG_REF, { ...DEFAULT_CONFIG, updatedAt: serverTimestamp() });
+    }
+  } catch (e) {
+    console.error("❌ Init config :", e);
+    state.error = "Accès à la configuration refusé. As-tu publié les nouvelles règles Firestore ? (" + (e.code || e.message) + ")";
+    state.ready = true;
+    emit();
   }
   onSnapshot(CONFIG_REF, (s) => {
     if (!s.exists()) { state.ready = true; emit(); return; }
@@ -118,25 +126,34 @@ export async function initStore(user, admin) {
       ranks:      d.ranks      || [],
       professors: d.professors || []
     };
+    state.error = null;
     state.ready = true;
+    emit();
+  }, (err) => {
+    console.error("❌ Lecture config :", err);
+    state.error = "Lecture de la configuration refusée. Vérifie les règles Firestore. (" + (err.code || err.message) + ")";
     emit();
   });
 
   // ---------- Classement personnel ----------
   userRef = doc(db, "rankings", user.uid);
-  const rsnap = await getDoc(userRef);
-  if (!rsnap.exists()) {
-    await setDoc(userRef, {
-      displayName: state.displayName,
-      placements: {},
-      updatedAt: serverTimestamp()
-    });
+  try {
+    const rsnap = await getDoc(userRef);
+    if (!rsnap.exists()) {
+      await setDoc(userRef, {
+        displayName: state.displayName,
+        placements: {},
+        updatedAt: serverTimestamp()
+      });
+    }
+  } catch (e) {
+    console.error("❌ Init classement :", e);
   }
   onSnapshot(userRef, (s) => {
     if (!s.exists()) return;
     state.placements = s.data().placements || {};
     emit();
-  });
+  }, (err) => console.error("❌ Lecture classement :", err));
 }
 
 // ============================================================

@@ -13,8 +13,13 @@ let bankFilter = "__all__";
 //  RENDU PRINCIPAL
 // ------------------------------------------------------------
 export function renderApp() {
-  const { config } = getState();
+  const { config, error } = getState();
   const wrap = document.getElementById("tierRows");
+  if (error) {
+    wrap.innerHTML = `<p class="login-error">⚠️ ${escapeHtml(error)}</p>`;
+    document.getElementById("bank").innerHTML = "";
+    return;
+  }
   if (!config) {
     wrap.innerHTML = `<p class="hint">⏳ En attente de la configuration par l'administrateur…</p>`;
     document.getElementById("bank").innerHTML = "";

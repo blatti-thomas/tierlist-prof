@@ -37,9 +37,18 @@ export const DEFAULT_THEME = {
 export const DEFAULT_CONFIG = {
   theme: { ...DEFAULT_THEME },
   branches: [
-    { id: "mecatronique", name: "Mécatronique" },
-    { id: "electronique", name: "Électronique embarquée" },
-    { id: "maths",        name: "Mathématiques" }
+    { id: "b_82mxdw6", name: "Physique 3" },
+    { id: "b_96xk7de", name: "Syslog1" },
+    { id: "b_azorxxx", name: "Math Elec 2" },
+    { id: "b_d0w3bu8", name: "Electro 2" },
+    { id: "b_lt0j637", name: "Python GE 2" },
+    { id: "b_r5nefqg", name: "TechMes" },
+    { id: "b_r3a4cvm", name: "Math Tin 3" },
+    { id: "b_0z5gxj3", name: "Regul Auto" },
+    { id: "b_20hqbzp", name: "El Puissan" },
+    { id: "b_ybjumgl", name: "Mecatro 1" },
+    { id: "b_y0xmh1b", name: "SignSys" },
+    { id: "b_g7zaip0", name: "Gestion de Projet" }
   ],
   ranks: [
     { id: "S", label: "S", color: "#ff5d5d" },
@@ -49,13 +58,19 @@ export const DEFAULT_CONFIG = {
     { id: "D", label: "D", color: "#4ab8ff" }
   ],
   professors: [
-    { id: "p_marc",   name: "Marc Dubois",    branchId: "mecatronique" },
-    { id: "p_sophie", name: "Sophie Lehmann",  branchId: "mecatronique" },
-    { id: "p_ali",    name: "Ali Benkacem",    branchId: "mecatronique" },
-    { id: "p_nadia",  name: "Nadia Rochat",    branchId: "mecatronique" },
-    { id: "p_pierre", name: "Pierre Müller",   branchId: "mecatronique" },
-    { id: "p_luca",   name: "Luca Bianchi",    branchId: "electronique" },
-    { id: "p_eva",    name: "Eva Schneider",   branchId: "maths" }
+    { id: "p_gz3n5ew", name: "Messerli Etienne",   branchId: "b_96xk7de" },
+    { id: "p_bt52myw", name: "Chaudet Bastien",    branchId: "b_azorxxx" },
+    { id: "p_8wsqzhb", name: "Grandjean Blaise",   branchId: "b_d0w3bu8" },
+    { id: "p_in7nhfx", name: "Chevallier Yves",    branchId: "b_lt0j637" },
+    { id: "p_7sd3qzl", name: "Jolissaint Laurent", branchId: "b_r5nefqg" },
+    { id: "p_4177eci", name: "Fornerod Jean",      branchId: "b_r3a4cvm" },
+    { id: "p_s765xke", name: "Bornand Cédric",     branchId: "b_r5nefqg" },
+    { id: "p_7y0qz58", name: "Bozorg Mokhtar",     branchId: "b_0z5gxj3" },
+    { id: "p_m5kcle5", name: "Siemaszko Daniel",   branchId: "b_20hqbzp" },
+    { id: "p_p61p1us", name: "Bossoney Luc",       branchId: "b_ybjumgl" },
+    { id: "p_y54bjoc", name: "Lavanchy David",     branchId: "b_y0xmh1b" },
+    { id: "p_xihf1tg", name: "Schintke Silvia",    branchId: "b_82mxdw6" },
+    { id: "p_6bsoah2", name: "Umberti Philippe",   branchId: "b_g7zaip0" }
   ]
 };
 

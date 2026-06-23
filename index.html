@@ -33,7 +33,8 @@
       <h1 class="brand">🎓 Tier List des Profs</h1>
       <div class="topbar-actions">
         <button id="openProfileBtn" class="btn btn-ghost">👤 <span id="profileName">…</span></button>
-        <button id="openAdminBtn" class="btn btn-accent hidden">⚙️ Admin</button>
+        <button id="openGalleryBtn" class="btn btn-ghost">🌍 Galerie</button>
+        <button id="openAdminBtn" class="btn btn-accent">⚙️ Ma tier list</button>
         <button id="logoutBtn" class="btn btn-ghost">Déconnexion</button>
       </div>
     </header>
@@ -55,7 +56,7 @@
   <div id="adminModal" class="modal">
     <div class="modal-card">
       <div class="modal-head">
-        <h2>⚙️ Panneau d'administration</h2>
+        <h2>⚙️ Ma tier list — profs, cours, catégories, apparence</h2>
         <button id="closeAdminBtn" class="btn btn-ghost btn-sm">✕</button>
       </div>
       <div class="modal-body">
@@ -116,12 +117,6 @@
           <button id="themeResetBtn" class="btn btn-ghost btn-sm">↺ Réinitialiser l'apparence</button>
         </div>
 
-        <div class="admin-col admin-col-wide">
-          <h3>👥 Classements des utilisateurs</h3>
-          <button id="loadRankingsBtn" class="btn btn-accent btn-sm">🔄 Charger les classements</button>
-          <div id="adminRankings" class="rankings-view"></div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -143,6 +138,19 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js"></script>
+  <!-- ============ MODALE GALERIE (commune) ============ -->
+  <div id="galleryModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>🌍 Galerie — les tier lists de tout le monde</h2>
+        <button id="closeGalleryBtn" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="galleryContent" class="gallery-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js?v=3"></script>
 </body>
 </html>

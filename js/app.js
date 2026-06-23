@@ -2,16 +2,16 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState, getState, setDisplayName } from "./store.js";
-import { watchAuth, login, register, logout, isAdmin, setProfileName } from "./auth.js";
-import { renderApp } from "./tierlist.js";
-import { initAdmin, renderAdmin } from "./admin.js";
-import { applyTheme } from "./theme.js";
+import { initStore, onState, getState, setDisplayName } from "./store.js?v=3";
+import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=3";
+import { renderApp } from "./tierlist.js?v=3";
+import { initAdmin, renderAdmin } from "./admin.js?v=3";
+import { initGallery } from "./galerie.js?v=3";
+import { applyTheme } from "./theme.js?v=3";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
 const adminModal  = document.getElementById("adminModal");
-const adminBtn    = document.getElementById("openAdminBtn");
 const profileName = document.getElementById("profileName");
 
 let storeReady = false;
@@ -21,7 +21,7 @@ function showLogin() { appScreen.classList.add("hidden");    loginScreen.classLi
 
 // --- Re-render à chaque changement d'état
 onState((state) => {
-  if (state.config) applyTheme(state.config.theme);
+  if (state.board) applyTheme(state.board.theme);
   profileName.textContent = state.displayName || "Profil";
   renderApp();
   if (adminModal.classList.contains("open")) renderAdmin();
@@ -30,11 +30,9 @@ onState((state) => {
 // --- Surveillance de la session
 watchAuth(
   async (user) => {
-    const admin = isAdmin(user);
-    adminBtn.classList.toggle("hidden", !admin);  // bouton Admin réservé à l'admin
     showApp();
     if (!storeReady) {
-      await initStore(user, admin);
+      await initStore(user);
       storeReady = true;
     }
   },
@@ -44,7 +42,7 @@ watchAuth(
   }
 );
 
-// --- Connexion / Inscription (e-mail + mot de passe uniquement)
+// --- Connexion / Inscription (e-mail + mot de passe)
 const emailEl = document.getElementById("email");
 const pwdEl   = document.getElementById("password");
 const errEl   = document.getElementById("loginError");
@@ -90,8 +88,8 @@ document.getElementById("saveProfileBtn").addEventListener("click", async () => 
   if (!name) { profileMsg.textContent = "Entre un pseudo 😉"; return; }
   profileMsg.textContent = "Enregistrement…";
   try {
-    await setDisplayName(name);   // classement (vu par l'admin)
-    await setProfileName(name);   // profil Firebase (prochaines connexions)
+    await setDisplayName(name);
+    await setProfileName(name);
     profileMsg.textContent = "Pseudo enregistré ✅";
   } catch (e) {
     console.error("Pseudo :", e);
@@ -125,5 +123,6 @@ function messageFor(ex) {
   }
 }
 
-// --- Branchements du panneau admin
+// --- Branchements
 initAdmin();
+initGallery();

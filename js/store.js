@@ -1,23 +1,21 @@
 // ============================================================
-//  COUCHE DE DONNÉES
-//  - config/main         : profs, branches, rangs, apparence (admin)
-//  - rankings/{uid}      : le classement personnel de chaque utilisateur
+//  COUCHE DE DONNÉES — Un tableau (board) par utilisateur
+//  boards/{uid} = { displayName, theme, branches, ranks, professors, tiers }
+//  - Chacun modifie SON board (profs, branches, rangs, apparence, classement)
+//  - Tout le monde peut LIRE tous les boards (galerie commune)
 // ============================================================
 
-import { db } from "./firebase-config.js";
+import { db } from "./firebase-config.js?v=3";
 import {
   doc, getDoc, setDoc, onSnapshot, collection, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const CONFIG_REF = doc(db, "config", "main");
-
-// --- ID court et unique pour les nouveaux éléments
 export function uid(prefix = "id") {
   return prefix + "_" + Math.random().toString(36).slice(2, 9);
 }
 
 // ============================================================
-//  THÈME PAR DÉFAUT (apparence personnalisable)
+//  THÈME PAR DÉFAUT
 // ============================================================
 export const DEFAULT_THEME = {
   font: "Fredoka",
@@ -31,10 +29,10 @@ export const DEFAULT_THEME = {
 };
 
 // ============================================================
-//  CONFIG PAR DÉFAUT (créée par l'admin au 1er lancement)
-//  Contient des profs de test en Mécatronique.
+//  CONTENU DE DÉPART d'un nouveau board (profs HEIG + rangs S→D)
+//  Chacun part avec ça, puis personnalise librement.
 // ============================================================
-export const DEFAULT_CONFIG = {
+export const DEFAULT_BOARD = {
   theme: { ...DEFAULT_THEME },
   branches: [
     { id: "b_82mxdw6", name: "Physique 3" },
@@ -71,24 +69,12 @@ export const DEFAULT_CONFIG = {
     { id: "p_y54bjoc", name: "Lavanchy David",     branchId: "b_y0xmh1b" },
     { id: "p_xihf1tg", name: "Schintke Silvia",    branchId: "b_82mxdw6" },
     { id: "p_6bsoah2", name: "Umberti Philippe",   branchId: "b_g7zaip0" }
-  ]
+  ],
+  tiers: {}   // rankId -> [profId, ...] (ordonné)
 };
 
-// ============================================================
-//  ÉTAT GLOBAL
-// ============================================================
-let state = {
-  config: null,        // { theme, branches, ranks, professors }
-  tiers: {},           // classement perso ORDONNÉ : rankId -> [profId, profId, ...]
-  isAdmin: false,
-  displayName: "",
-  uid: null,
-  ready: false,
-  error: null
-};
-
-// Convertit l'ancien format { profId: rankId } vers le nouveau { rankId: [profId] }
-export function tiersFromPlacements(placements) {
+// Convertit un éventuel ancien format { profId: rankId } vers { rankId: [profId] }
+function tiersFromPlacements(placements) {
   const t = {};
   Object.entries(placements || {}).forEach(([profId, rankId]) => {
     (t[rankId] = t[rankId] || []).push(profId);
@@ -96,152 +82,143 @@ export function tiersFromPlacements(placements) {
   return t;
 }
 
+// ============================================================
+//  ÉTAT GLOBAL
+// ============================================================
+let state = {
+  board: null,         // { theme, branches, ranks, professors, tiers }
+  displayName: "",
+  uid: null,
+  ready: false,
+  error: null
+};
+
 const listeners = new Set();
 export function getState() { return state; }
 export function onState(cb) { listeners.add(cb); return () => listeners.delete(cb); }
 function emit() { listeners.forEach(cb => cb(state)); }
 
-let userRef = null;
-let configSaveTimer = null;
-let rankSaveTimer = null;
+let myRef = null;
+let saveTimer = null;
 
 // ============================================================
 //  INITIALISATION (à la connexion)
 // ============================================================
-export async function initStore(user, admin) {
+export async function initStore(user) {
   state.uid = user.uid;
-  state.isAdmin = admin;
   state.displayName = user.displayName
     || (user.email ? user.email.split("@")[0] : "Utilisateur");
 
-  // ---------- CONFIG partagée ----------
+  myRef = doc(db, "boards", user.uid);
+
   try {
-    const snap = await getDoc(CONFIG_REF);
-    if (!snap.exists() && admin) {
-      await setDoc(CONFIG_REF, { ...DEFAULT_CONFIG, updatedAt: serverTimestamp() });
+    const snap = await getDoc(myRef);
+    if (!snap.exists()) {
+      await setDoc(myRef, {
+        displayName: state.displayName,
+        ...structuredClone(DEFAULT_BOARD),
+        updatedAt: serverTimestamp()
+      });
     }
   } catch (e) {
-    console.error("❌ Init config :", e);
-    state.error = "Accès à la configuration refusé. As-tu publié les nouvelles règles Firestore ? (" + (e.code || e.message) + ")";
+    console.error("❌ Init board :", e);
+    state.error = "Accès refusé. As-tu publié les nouvelles règles Firestore ? (" + (e.code || e.message) + ")";
     state.ready = true;
     emit();
   }
-  onSnapshot(CONFIG_REF, (s) => {
+
+  onSnapshot(myRef, (s) => {
     if (!s.exists()) { state.ready = true; emit(); return; }
     const d = s.data();
-    state.config = {
+    state.board = {
       theme:      { ...DEFAULT_THEME, ...(d.theme || {}) },
       branches:   d.branches   || [],
       ranks:      d.ranks      || [],
-      professors: d.professors || []
+      professors: d.professors || [],
+      tiers:      d.tiers || tiersFromPlacements(d.placements)
     };
+    if (d.displayName) state.displayName = d.displayName;
     state.error = null;
     state.ready = true;
     emit();
   }, (err) => {
-    console.error("❌ Lecture config :", err);
-    state.error = "Lecture de la configuration refusée. Vérifie les règles Firestore. (" + (err.code || err.message) + ")";
+    console.error("❌ Lecture board :", err);
+    state.error = "Lecture refusée. Vérifie les règles Firestore. (" + (err.code || err.message) + ")";
     emit();
   });
-
-  // ---------- Classement personnel ----------
-  userRef = doc(db, "rankings", user.uid);
-  try {
-    const rsnap = await getDoc(userRef);
-    if (!rsnap.exists()) {
-      await setDoc(userRef, {
-        displayName: state.displayName,
-        tiers: {},
-        updatedAt: serverTimestamp()
-      });
-    } else {
-      const d = rsnap.data();
-      state.tiers = d.tiers || tiersFromPlacements(d.placements);
-      if (d.displayName) state.displayName = d.displayName; // le classement fait foi
-    }
-  } catch (e) {
-    console.error("❌ Init classement :", e);
-  }
-  onSnapshot(userRef, (s) => {
-    if (!s.exists()) return;
-    const d = s.data();
-    state.tiers = d.tiers || tiersFromPlacements(d.placements);
-    if (d.displayName) state.displayName = d.displayName;
-    emit();
-  }, (err) => console.error("❌ Lecture classement :", err));
 }
 
 // ============================================================
-//  ÉDITION DE LA CONFIG (admin uniquement)
+//  ÉDITION DE SON BOARD (profs, branches, rangs, apparence)
 // ============================================================
-export function commitConfig(mutator) {
-  if (!state.config) return;
-  const draft = structuredClone(state.config);
+export function commitBoard(mutator) {
+  if (!state.board) return;
+  const draft = structuredClone(state.board);
   mutator(draft);
-  state.config = draft;
+  state.board = draft;
   emit();
-  clearTimeout(configSaveTimer);
-  configSaveTimer = setTimeout(async () => {
-    try {
-      await setDoc(CONFIG_REF, { ...state.config, updatedAt: serverTimestamp() });
-    } catch (e) { console.error("❌ Sauvegarde config :", e); }
-  }, 400);
+  scheduleSave();
 }
 
 // ============================================================
 //  DÉPLACER UN PROF dans un rang à une position précise
-//  rankId = null  → renvoyé dans la banque
-//  index          → position dans le rang (0 = tout à gauche)
+//  rankId = null → renvoyé dans la banque ; index = position (0 = gauche)
 // ============================================================
 export function moveProf(profId, rankId, index) {
-  const tiers = structuredClone(state.tiers);
+  if (!state.board) return;
+  const board = structuredClone(state.board);
+  const tiers = board.tiers || {};
 
-  // retire le prof de tous les rangs
   for (const k of Object.keys(tiers)) {
     tiers[k] = (tiers[k] || []).filter(id => id !== profId);
     if (!tiers[k].length) delete tiers[k];
   }
-
-  // l'insère à la bonne position (sauf retour banque)
   if (rankId != null) {
     const arr = tiers[rankId] || [];
     const i = Math.max(0, Math.min(index == null ? arr.length : index, arr.length));
     arr.splice(i, 0, profId);
     tiers[rankId] = arr;
   }
-
-  state.tiers = tiers;
+  board.tiers = tiers;
+  state.board = board;
   emit();
-  clearTimeout(rankSaveTimer);
-  rankSaveTimer = setTimeout(() => {
-    saveRankingNow().catch(e => console.error("❌ Sauvegarde classement :", e));
-  }, 300);
+  scheduleSave();
 }
 
-function saveRankingNow() {
-  return setDoc(userRef, {
+// ============================================================
+//  CHANGER SON PSEUDO
+// ============================================================
+export async function setDisplayName(name) {
+  const clean = (name || "").trim();
+  if (!clean || !myRef) return;
+  state.displayName = clean;
+  emit();
+  await saveNow();
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => saveNow().catch(e => console.error("❌ Sauvegarde :", e)), 350);
+}
+
+function saveNow() {
+  if (!state.board) return Promise.resolve();
+  return setDoc(myRef, {
     displayName: state.displayName,
-    tiers: state.tiers,
-    updatedAt: serverTimestamp()
+    theme:      state.board.theme,
+    branches:   state.board.branches,
+    ranks:      state.board.ranks,
+    professors: state.board.professors,
+    tiers:      state.board.tiers,
+    updatedAt:  serverTimestamp()
   });
 }
 
 // ============================================================
-//  CHANGER SON PSEUDO (n'importe quand)
+//  CHARGER TOUS LES BOARDS (galerie commune)
 // ============================================================
-export async function setDisplayName(name) {
-  const clean = (name || "").trim();
-  if (!clean || !userRef) return;
-  state.displayName = clean;
-  emit();
-  await saveRankingNow();   // les erreurs remontent à l'appelant (affichées dans la modale)
-}
-
-// ============================================================
-//  CHARGER TOUS LES CLASSEMENTS (admin uniquement)
-// ============================================================
-export async function loadAllRankings() {
-  const qs = await getDocs(collection(db, "rankings"));
+export async function loadAllBoards() {
+  const qs = await getDocs(collection(db, "boards"));
   const out = [];
   qs.forEach(d => out.push({ uid: d.id, ...d.data() }));
   return out;

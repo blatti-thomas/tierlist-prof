@@ -3,7 +3,7 @@
 //  Inscription ouverte : chacun crée son propre compte.
 // ============================================================
 
-import { auth, ADMIN_EMAIL } from "./firebase-config.js";
+import { auth } from "./firebase-config.js?v=3";
 import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword,
   signOut, onAuthStateChanged, updateProfile
@@ -25,11 +25,6 @@ export function login(email, password) {
 
 export function logout() {
   return signOut(auth);
-}
-
-// L'administrateur est identifié par son e-mail.
-export function isAdmin(user) {
-  return !!user && user.email === ADMIN_EMAIL;
 }
 
 // Met à jour le pseudo dans le profil Firebase Auth (pour les prochaines connexions).

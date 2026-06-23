@@ -1,37 +1,21 @@
 rules_version = '2';
 
 // ============================================================
-//  RÈGLES DE SÉCURITÉ FIRESTORE — Mode multi-utilisateurs
+//  RÈGLES DE SÉCURITÉ FIRESTORE — Une tier list par utilisateur
 //  À copier-coller dans : Console Firebase → Firestore Database
 //  → onglet "Règles" (Rules) → Publier.
 //
-//  - config/main      : lue par tous les connectés, modifiable par l'ADMIN
-//  - rankings/{uid}   : chacun lit/écrit SON classement ; l'admin lit tout
-//
-//  ⚠️ Remplace l'e-mail ci-dessous par celui de TON compte admin
-//     (le même que ADMIN_EMAIL dans js/firebase-config.js).
+//  boards/{uid} : la tier list complète d'un utilisateur
+//    - LECTURE : tous les connectés (pour la galerie commune)
+//    - ÉCRITURE : uniquement le propriétaire (uid == son compte)
 // ============================================================
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAdmin() {
-      return request.auth != null
-        && request.auth.token.email == 'thomas.2048.blatti@gmail.com';
-    }
-
-    // Configuration partagée (profs, branches, rangs, apparence)
-    match /config/{docId} {
-      allow read:  if request.auth != null;
-      allow write: if isAdmin();
-    }
-
-    // Classement personnel de chaque utilisateur
-    match /rankings/{userId} {
-      allow read:          if request.auth != null
-                              && (request.auth.uid == userId || isAdmin());
-      allow create, update: if request.auth != null
-                              && request.auth.uid == userId;
-      allow delete:        if isAdmin();
+    match /boards/{userId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if request.auth != null
+                                    && request.auth.uid == userId;
     }
 
     // Tout le reste est verrouillé

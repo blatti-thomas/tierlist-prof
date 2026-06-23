@@ -325,7 +325,23 @@ body {
 .theme-grid input[type="range"] { width: 100%; accent-color: var(--primary); }
 .theme-grid .ipt-color { width: 100%; height: 40px; }
 
-/* ---------- Affichage des classements (admin) ---------- */
+/* ---------- Galerie commune ---------- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+.gallery-card {
+  background: #fff;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.gallery-card h3 { font-size: 1.1rem; margin-bottom: 10px; word-break: break-word; }
+
+/* ---------- Affichage des classements ---------- */
 .rankings-view {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

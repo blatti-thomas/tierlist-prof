@@ -3,8 +3,8 @@
 //  Lit la config partagée + le classement perso ordonné (tiers).
 // ============================================================
 
-import { getState, moveProf } from "./store.js";
-import { escapeHtml } from "./util.js";
+import { getState, moveProf } from "./store.js?v=3";
+import { escapeHtml } from "./util.js?v=3";
 
 const BANK_ZONE = "__bank__";
 
@@ -12,15 +12,15 @@ const BANK_ZONE = "__bank__";
 //  RENDU PRINCIPAL
 // ------------------------------------------------------------
 export function renderApp() {
-  const { config, error } = getState();
+  const { board, error } = getState();
   const wrap = document.getElementById("tierRows");
   if (error) {
     wrap.innerHTML = `<p class="login-error">⚠️ ${escapeHtml(error)}</p>`;
     document.getElementById("bank").innerHTML = "";
     return;
   }
-  if (!config) {
-    wrap.innerHTML = `<p class="hint">⏳ En attente de la configuration par l'administrateur…</p>`;
+  if (!board) {
+    wrap.innerHTML = `<p class="hint">⏳ Chargement de ta tier list…</p>`;
     document.getElementById("bank").innerHTML = "";
     return;
   }
@@ -29,15 +29,16 @@ export function renderApp() {
 }
 
 function profById(id) {
-  return getState().config.professors.find(p => p.id === id);
+  return getState().board.professors.find(p => p.id === id);
 }
 
 function renderTiers() {
-  const { config, tiers } = getState();
+  const { board } = getState();
+  const tiers = board.tiers;
   const wrap = document.getElementById("tierRows");
   wrap.innerHTML = "";
 
-  config.ranks.forEach(rank => {
+  board.ranks.forEach(rank => {
     const row = document.createElement("div");
     row.className = "tier-row";
 
@@ -61,15 +62,15 @@ function renderTiers() {
 }
 
 function renderBank() {
-  const { config, tiers } = getState();
+  const { board } = getState();
   const bank = document.getElementById("bank");
   bank.innerHTML = "";
   bank.classList.add("dropzone");
   bank.dataset.drop = BANK_ZONE;
 
   // profs présents dans aucun rang
-  const placed = new Set(Object.values(tiers).flat());
-  const list = config.professors.filter(p => !placed.has(p.id));
+  const placed = new Set(Object.values(board.tiers).flat());
+  const list = board.professors.filter(p => !placed.has(p.id));
 
   if (list.length === 0) {
     const empty = document.createElement("p");
@@ -82,12 +83,12 @@ function renderBank() {
 }
 
 function makeChip(p) {
-  const { config } = getState();
+  const { board } = getState();
   const chip = document.createElement("div");
   chip.className = "chip";
   chip.dataset.prof = p.id;
 
-  const branch = config.branches.find(b => b.id === p.branchId);
+  const branch = board.branches.find(b => b.id === p.branchId);
   chip.innerHTML =
     `<span class="chip-name">${escapeHtml(p.name)}</span>` +
     (branch ? `<span class="chip-branch">${escapeHtml(branch.name)}</span>` : "");

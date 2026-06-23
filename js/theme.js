@@ -3,7 +3,7 @@
 //  Applique les variables CSS et gère les contrôles de l'admin.
 // ============================================================
 
-import { commitConfig, DEFAULT_THEME } from "./store.js";
+import { commitBoard, DEFAULT_THEME } from "./store.js?v=3";
 
 // Polices proposées (clé = nom affiché, valeur = nom pour Google Fonts)
 export const FONTS = {
@@ -45,7 +45,7 @@ export function applyTheme(theme) {
 }
 
 function setTheme(patch) {
-  commitConfig(d => { d.theme = { ...DEFAULT_THEME, ...d.theme, ...patch }; });
+  commitBoard(d => { d.theme = { ...DEFAULT_THEME, ...d.theme, ...patch }; });
 }
 
 // ------------------------------------------------------------

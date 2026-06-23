@@ -6,6 +6,7 @@ import { initStore, onState } from "./store.js";
 import { watchAuth, login, logout } from "./auth.js";
 import { renderApp } from "./tierlist.js";
 import { initAdmin, renderAdmin } from "./admin.js";
+import { applyTheme } from "./theme.js";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
@@ -17,7 +18,8 @@ function showApp()   { loginScreen.classList.add("hidden");  appScreen.classList
 function showLogin() { appScreen.classList.add("hidden");    loginScreen.classList.remove("hidden"); }
 
 // --- Re-render à chaque changement d'état (local OU temps réel Firestore)
-onState(() => {
+onState((state) => {
+  if (state) applyTheme(state.theme);
   renderApp();
   if (adminModal.classList.contains("open")) renderAdmin();
 });

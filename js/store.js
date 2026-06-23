@@ -30,15 +30,32 @@ function meaningful(s) {
     branches: s.branches,
     ranks: s.ranks,
     professors: s.professors,
-    placements: s.placements
+    placements: s.placements,
+    theme: s.theme
   };
 }
+
+// ============================================================
+//  THÈME PAR DÉFAUT (apparence personnalisable)
+// ============================================================
+export const DEFAULT_THEME = {
+  font: "Fredoka",      // police Google Fonts
+  baseSize: 16,         // taille de base du texte (px)
+  bg: "#fff7e8",        // couleur de fond
+  text: "#15151e",      // couleur du texte
+  border: "#15151e",    // couleur des contours/bordures
+  primary: "#ff5d8f",   // couleur primaire (boutons principaux)
+  accent: "#4ab8ff",    // couleur d'accent
+  radius: 22,           // arrondi des angles (px)
+  tierLabelWidth: 90    // largeur des étiquettes de rang (px)
+};
 
 // ============================================================
 //  DONNÉES DE TEST (profs fictifs en Mécatronique notamment)
 //  Créées automatiquement au tout premier lancement.
 // ============================================================
 export const DEFAULT_DATA = {
+  theme: { ...DEFAULT_THEME },
   branches: [
     { id: "mecatronique", name: "Mécatronique" },
     { id: "electronique", name: "Électronique embarquée" },
@@ -79,7 +96,8 @@ export async function initStore() {
       branches:   data.branches   || [],
       ranks:      data.ranks      || [],
       professors: data.professors || [],
-      placements: data.placements || {}
+      placements: data.placements || {},
+      theme:      { ...DEFAULT_THEME, ...(data.theme || {}) }
     };
     // Ignore l'écho de notre propre écriture (évite de casser un drag en cours)
     if (state && JSON.stringify(meaningful(incoming)) === JSON.stringify(meaningful(state))) return;

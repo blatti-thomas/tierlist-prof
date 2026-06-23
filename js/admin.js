@@ -6,10 +6,12 @@
 
 import { getState, commit, uid } from "./store.js";
 import { escapeHtml, randomColor } from "./util.js";
+import { initThemeControls, renderThemeControls } from "./theme.js";
 
 export function initAdmin() {
   document.getElementById("openAdminBtn").onclick = openAdmin;
   document.getElementById("closeAdminBtn").onclick = closeAdmin;
+  initThemeControls();
 
   document.getElementById("addProfBtn").onclick = () => {
     const name = document.getElementById("newProfName").value.trim();
@@ -49,6 +51,7 @@ export function renderAdmin() {
   renderBranchAdmin(state);
   renderRankAdmin(state);
   populateNewProfBranch(state);
+  renderThemeControls(state);
 }
 
 // ---------- Professeurs ----------

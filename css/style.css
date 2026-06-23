@@ -3,26 +3,35 @@
    ============================================================ */
 
 :root {
-  --ink: #15151e;            /* noir des bordures   */
+  /* --- Variables personnalisables via le panneau "Apparence" --- */
+  --font: 'Fredoka', system-ui, sans-serif;
+  --base-size: 16px;
+  --ink: #15151e;            /* contours / bordures */
+  --text: #15151e;           /* couleur du texte    */
   --paper: #fff7e8;          /* fond crème          */
-  --paper-2: #ffeec9;
   --primary: #ff5d8f;        /* rose vif            */
   --accent: #4ab8ff;         /* bleu vif            */
+  --radius: 22px;
+  --tier-label-w: 90px;      /* largeur étiquettes de rang */
+
+  /* --- Variables fixes --- */
+  --paper-2: #ffeec9;
   --yellow: #ffd84a;
   --green: #7ed957;
   --purple: #b06bff;
   --shadow: 6px 6px 0 var(--ink);
   --shadow-sm: 4px 4px 0 var(--ink);
-  --radius: 22px;
   --radius-sm: 14px;
   --border: 3.5px solid var(--ink);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html { font-size: var(--base-size); }
+
 body {
-  font-family: 'Fredoka', system-ui, sans-serif;
-  color: var(--ink);
+  font-family: var(--font);
+  color: var(--text);
   background:
     radial-gradient(circle at 12% 18%, #ffe0ec 0, transparent 38%),
     radial-gradient(circle at 88% 12%, #d6f0ff 0, transparent 38%),
@@ -42,7 +51,7 @@ body {
   border: var(--border);
   border-radius: var(--radius-sm);
   background: #fff;
-  color: var(--ink);
+  color: var(--text);
   padding: 10px 18px;
   box-shadow: var(--shadow-sm);
   transition: transform .08s ease, box-shadow .08s ease;
@@ -67,7 +76,7 @@ body {
   border-radius: 12px;
   padding: 10px 12px;
   background: #fff;
-  color: var(--ink);
+  color: var(--text);
   outline: none;
 }
 .ipt:focus { box-shadow: var(--shadow-sm); }
@@ -143,16 +152,17 @@ body {
   min-height: 84px;
 }
 .tier-label {
-  flex: 0 0 84px;
+  flex: 0 0 var(--tier-label-w);
   display: grid;
   place-items: center;
-  font-size: 1.8rem;
+  font-size: clamp(0.8rem, 2.2vw, 1.8rem);
+  line-height: 1.05;
   font-weight: 700;
   color: #fff;
   text-shadow: 2px 2px 0 rgba(0,0,0,.35);
   border-right: var(--border);
   padding: 6px;
-  word-break: break-word;
+  overflow-wrap: anywhere;
   text-align: center;
 }
 .tier-zone {
@@ -277,11 +287,29 @@ body {
 }
 .admin-item .ipt { flex: 1; min-width: 0; padding: 6px 8px; font-size: .9rem; }
 /* Les menus déroulants prennent toute la largeur de la ligne (texte non coupé) */
-.admin-item select.ipt { flex: 1 1 100%; }
+.admin-item select.ipt { flex: 1 1 100%; width: 100%; min-width: 100%; }
 
 .admin-add { display: flex; gap: 6px; flex-wrap: wrap; }
 .admin-add .ipt { flex: 1; min-width: 90px; }
-.admin-add select.ipt { flex: 1 1 100%; }
+.admin-add select.ipt { flex: 1 1 100%; width: 100%; min-width: 100%; }
+
+/* ---------- Panneau "Apparence" ---------- */
+.admin-col-wide { grid-column: 1 / -1; }
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.theme-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  font-size: .9rem;
+}
+.theme-grid input[type="range"] { width: 100%; accent-color: var(--primary); }
+.theme-grid .ipt-color { width: 100%; height: 40px; }
 
 /* ============================================================
    RESPONSIVE

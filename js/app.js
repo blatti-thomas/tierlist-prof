@@ -2,8 +2,8 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState, getState } from "./store.js";
-import { watchAuth, login, register, logout, isAdmin } from "./auth.js";
+import { initStore, onState, getState, setDisplayName } from "./store.js";
+import { watchAuth, login, register, logout, isAdmin, setProfileName } from "./auth.js";
 import { renderApp } from "./tierlist.js";
 import { initAdmin, renderAdmin } from "./admin.js";
 import { applyTheme } from "./theme.js";
@@ -12,6 +12,7 @@ const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
 const adminModal  = document.getElementById("adminModal");
 const adminBtn    = document.getElementById("openAdminBtn");
+const profileName = document.getElementById("profileName");
 
 let storeReady = false;
 
@@ -21,6 +22,7 @@ function showLogin() { appScreen.classList.add("hidden");    loginScreen.classLi
 // --- Re-render à chaque changement d'état
 onState((state) => {
   if (state.config) applyTheme(state.config.theme);
+  profileName.textContent = state.displayName || "Profil";
   renderApp();
   if (adminModal.classList.contains("open")) renderAdmin();
 });
@@ -42,9 +44,8 @@ watchAuth(
   }
 );
 
-// --- Connexion / Inscription
+// --- Connexion / Inscription (e-mail + mot de passe uniquement)
 const emailEl = document.getElementById("email");
-const nameEl  = document.getElementById("displayName");
 const pwdEl   = document.getElementById("password");
 const errEl   = document.getElementById("loginError");
 
@@ -61,10 +62,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
   errEl.textContent = "";
-  const name = nameEl.value.trim();
-  if (!name) { errEl.textContent = "Choisis un pseudo pour créer ton compte 😉"; return; }
   try {
-    await register(emailEl.value.trim(), pwdEl.value, name);
+    await register(emailEl.value.trim(), pwdEl.value);
   } catch (ex) {
     errEl.textContent = messageFor(ex);
     console.error("Inscription :", ex.code, ex.message);
@@ -72,6 +71,27 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
 });
 
 document.getElementById("logoutBtn").addEventListener("click", () => logout());
+
+// --- Modale profil (changer son pseudo)
+const profileModal  = document.getElementById("profileModal");
+const profilePseudo = document.getElementById("profilePseudo");
+const profileMsg    = document.getElementById("profileMsg");
+
+document.getElementById("openProfileBtn").addEventListener("click", () => {
+  profileMsg.textContent = "";
+  profilePseudo.value = getState().displayName || "";
+  profileModal.classList.add("open");
+});
+document.getElementById("closeProfileBtn").addEventListener("click", () => {
+  profileModal.classList.remove("open");
+});
+document.getElementById("saveProfileBtn").addEventListener("click", async () => {
+  const name = profilePseudo.value.trim();
+  if (!name) { profileMsg.textContent = "Entre un pseudo 😉"; return; }
+  await setDisplayName(name);   // classement (vu par l'admin)
+  await setProfileName(name);   // profil Firebase (prochaines connexions)
+  profileMsg.textContent = "Pseudo enregistré ✅";
+});
 
 // Traduit les codes d'erreur Firebase en messages clairs
 function messageFor(ex) {

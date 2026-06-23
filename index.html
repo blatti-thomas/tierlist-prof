@@ -19,8 +19,6 @@
       <p class="login-sub">Connecte-toi ou crée ton compte pour faire ton classement</p>
       <input type="email" id="email" class="ipt ipt-lg"
              placeholder="E-mail" autocomplete="email" required>
-      <input type="text" id="displayName" class="ipt ipt-lg"
-             placeholder="Pseudo (pour créer un compte)" autocomplete="nickname">
       <input type="password" id="password" class="ipt ipt-lg"
              placeholder="Mot de passe" autocomplete="current-password" required>
       <button type="submit" class="btn btn-primary btn-block">Se connecter 🚀</button>
@@ -34,6 +32,7 @@
     <header class="topbar">
       <h1 class="brand">🎓 Tier List des Profs</h1>
       <div class="topbar-actions">
+        <button id="openProfileBtn" class="btn btn-ghost">👤 <span id="profileName">…</span></button>
         <button id="openAdminBtn" class="btn btn-accent hidden">⚙️ Admin</button>
         <button id="logoutBtn" class="btn btn-ghost">Déconnexion</button>
       </div>
@@ -124,6 +123,23 @@
           <div id="adminRankings" class="rankings-view"></div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE PROFIL (tout le monde) ============ -->
+  <div id="profileModal" class="modal">
+    <div class="modal-card modal-card-sm">
+      <div class="modal-head">
+        <h2>👤 Mon profil</h2>
+        <button id="closeProfileBtn" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+      <div class="modal-body modal-body-sm">
+        <label class="profile-field">Ton pseudo
+          <input id="profilePseudo" class="ipt" placeholder="Ton pseudo" maxlength="40">
+        </label>
+        <button id="saveProfileBtn" class="btn btn-primary btn-block">💾 Enregistrer</button>
+        <p id="profileMsg" class="hint"></p>
       </div>
     </div>
   </div>

@@ -196,6 +196,23 @@ export function setPlacement(profId, rankId) {
 }
 
 // ============================================================
+//  CHANGER SON PSEUDO (n'importe quand)
+// ============================================================
+export async function setDisplayName(name) {
+  const clean = (name || "").trim();
+  if (!clean || !userRef) return;
+  state.displayName = clean;
+  emit();
+  try {
+    await setDoc(userRef, {
+      displayName: clean,
+      placements: state.placements,
+      updatedAt: serverTimestamp()
+    });
+  } catch (e) { console.error("❌ Sauvegarde pseudo :", e); }
+}
+
+// ============================================================
 //  CHARGER TOUS LES CLASSEMENTS (admin uniquement)
 // ============================================================
 export async function loadAllRankings() {

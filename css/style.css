@@ -266,6 +266,15 @@ body {
   border-bottom: var(--border);
 }
 .modal-head h2 { font-size: 1.3rem; text-shadow: 2px 2px 0 rgba(0,0,0,.25); }
+.modal-card-sm { max-width: 420px; }
+.modal-body-sm { display: block; }
+.modal-body-sm .profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
 .modal-body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));

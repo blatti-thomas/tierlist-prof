@@ -31,3 +31,10 @@ export function logout() {
 export function isAdmin(user) {
   return !!user && user.email === ADMIN_EMAIL;
 }
+
+// Met à jour le pseudo dans le profil Firebase Auth (pour les prochaines connexions).
+export function setProfileName(name) {
+  return auth.currentUser
+    ? updateProfile(auth.currentUser, { displayName: name })
+    : Promise.resolve();
+}

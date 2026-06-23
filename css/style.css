@@ -1,0 +1,290 @@
+/* ============================================================
+   TIER LIST DES PROFS — Style "Cartoon" / Flat
+   ============================================================ */
+
+:root {
+  --ink: #15151e;            /* noir des bordures   */
+  --paper: #fff7e8;          /* fond crème          */
+  --paper-2: #ffeec9;
+  --primary: #ff5d8f;        /* rose vif            */
+  --accent: #4ab8ff;         /* bleu vif            */
+  --yellow: #ffd84a;
+  --green: #7ed957;
+  --purple: #b06bff;
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-sm: 4px 4px 0 var(--ink);
+  --radius: 22px;
+  --radius-sm: 14px;
+  --border: 3.5px solid var(--ink);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Fredoka', system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 18%, #ffe0ec 0, transparent 38%),
+    radial-gradient(circle at 88% 12%, #d6f0ff 0, transparent 38%),
+    radial-gradient(circle at 50% 92%, #fff2c2 0, transparent 45%),
+    var(--paper);
+  min-height: 100vh;
+}
+
+.hidden { display: none !important; }
+
+/* ---------- Boutons ---------- */
+.btn {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--ink);
+  padding: 10px 18px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .08s ease, box-shadow .08s ease;
+  line-height: 1;
+}
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.btn:disabled { opacity: .4; cursor: not-allowed; box-shadow: var(--shadow-sm); transform: none; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-accent  { background: var(--accent);  color: #fff; }
+.btn-danger  { background: #ff4d4d;        color: #fff; }
+.btn-ghost   { background: #fff; }
+.btn-block   { width: 100%; }
+.btn-sm      { padding: 6px 10px; font-size: .9rem; border-radius: 10px; box-shadow: 3px 3px 0 var(--ink); }
+
+/* ---------- Champs ---------- */
+.ipt {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  border: var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+}
+.ipt:focus { box-shadow: var(--shadow-sm); }
+.ipt-lg { font-size: 1.15rem; padding: 14px 16px; text-align: center; }
+.ipt-color {
+  width: 46px; height: 40px; padding: 2px;
+  border: var(--border); border-radius: 12px; background: #fff; cursor: pointer;
+}
+
+/* ============================================================
+   ÉCRAN DE CONNEXION
+   ============================================================ */
+.login-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 34px 28px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.login-emoji { font-size: 3.4rem; }
+.login-title { font-size: 1.8rem; font-weight: 700; }
+.login-sub { font-weight: 500; opacity: .7; margin-bottom: 4px; }
+.login-error { color: #e23; font-weight: 600; min-height: 1.2em; }
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  padding: 14px 20px;
+  background: var(--yellow);
+  border-bottom: var(--border);
+}
+.brand { font-size: 1.5rem; font-weight: 700; }
+.topbar-actions { display: flex; gap: 10px; }
+
+/* ============================================================
+   PLATEAU / TIER LIST
+   ============================================================ */
+.board {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.tier-rows { display: flex; flex-direction: column; gap: 14px; }
+
+.tier-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  min-height: 84px;
+}
+.tier-label {
+  flex: 0 0 84px;
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 2px 2px 0 rgba(0,0,0,.35);
+  border-right: var(--border);
+  padding: 6px;
+  word-break: break-word;
+  text-align: center;
+}
+.tier-zone {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 10px;
+  padding: 12px;
+  transition: background .12s ease;
+}
+
+/* ---------- Banque ---------- */
+.bank-card {
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+.bank-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.bank-head h2 { font-size: 1.25rem; }
+.bank {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  min-height: 70px;
+  padding: 12px;
+  background: #fff;
+  border: 3px dashed var(--ink);
+  border-radius: var(--radius-sm);
+  transition: background .12s ease;
+}
+.bank-empty { opacity: .55; font-weight: 500; align-self: center; }
+.hint { margin-top: 10px; font-weight: 500; opacity: .65; font-size: .92rem; }
+
+/* ---------- Zone survolée pendant le drag ---------- */
+.drop-hover { background: #fff3b0 !important; }
+
+/* ============================================================
+   ÉTIQUETTES (CHIPS) DE PROFS
+   ============================================================ */
+.chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+  border: var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  padding: 8px 12px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;            /* indispensable pour le drag tactile */
+  transition: transform .08s ease;
+}
+.chip:active { cursor: grabbing; }
+.chip:hover { transform: translate(-1px, -1px) rotate(-1deg); }
+.chip-name { font-weight: 600; font-size: 1rem; }
+.chip-branch { font-size: .72rem; font-weight: 500; opacity: .6; }
+
+.chip-dragging { opacity: .25; }
+.chip-ghost {
+  position: fixed;
+  z-index: 1000;
+  margin: 0;
+  pointer-events: none;
+  transform: rotate(-3deg) scale(1.05);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+
+/* ============================================================
+   MODALE ADMIN
+   ============================================================ */
+.modal {
+  display: none;
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(0,0,0,.45);
+  padding: 20px;
+  overflow: auto;
+}
+.modal.open { display: grid; place-items: start center; }
+.modal-card {
+  width: 100%; max-width: 960px;
+  margin: 30px 0;
+  background: var(--paper);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--accent);
+  color: #fff;
+  border-bottom: var(--border);
+}
+.modal-head h2 { font-size: 1.3rem; text-shadow: 2px 2px 0 rgba(0,0,0,.25); }
+.modal-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 18px;
+  padding: 20px;
+}
+.admin-col {
+  background: #fff;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.admin-col h3 { margin-bottom: 12px; font-size: 1.1rem; }
+.admin-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.admin-item {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: 10px;
+  padding: 6px;
+}
+.admin-item .ipt { flex: 1; min-width: 0; padding: 6px 8px; font-size: .9rem; }
+.admin-add { display: flex; gap: 6px; flex-wrap: wrap; }
+.admin-add .ipt { flex: 1; min-width: 90px; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 560px) {
+  .brand { font-size: 1.15rem; }
+  .tier-label { flex-basis: 60px; font-size: 1.3rem; }
+  .login-card { padding: 26px 20px; }
+  .btn { font-size: .92rem; padding: 9px 14px; }
+}

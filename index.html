@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tier List des Profs 🎓</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============ ÉCRAN DE CONNEXION (verrouillage) ============ -->
+  <section id="loginScreen" class="login-screen">
+    <form id="loginForm" class="login-card">
+      <div class="login-emoji">🔒</div>
+      <h1 class="login-title">Tier List des Profs</h1>
+      <p class="login-sub">Entre le mot de passe pour débloquer l'app</p>
+      <input type="password" id="password" class="ipt ipt-lg"
+             placeholder="Mot de passe" autocomplete="current-password" required>
+      <button type="submit" class="btn btn-primary btn-block">Entrer 🚀</button>
+      <p id="loginError" class="login-error"></p>
+    </form>
+  </section>
+
+  <!-- ============ APPLICATION ============ -->
+  <section id="appScreen" class="app-screen hidden">
+    <header class="topbar">
+      <h1 class="brand">🎓 Tier List des Profs</h1>
+      <div class="topbar-actions">
+        <button id="openAdminBtn" class="btn btn-accent">⚙️ Admin</button>
+        <button id="logoutBtn" class="btn btn-ghost">Déconnexion</button>
+      </div>
+    </header>
+
+    <main class="board">
+      <div id="tierRows" class="tier-rows"></div>
+
+      <div class="bank-card">
+        <div class="bank-head">
+          <h2>🎒 Banque de profs</h2>
+          <select id="bankFilter" class="ipt"></select>
+        </div>
+        <div id="bank" class="bank"></div>
+        <p class="hint">Glisse-dépose un prof vers un rang, ou ramène-le ici 👇</p>
+      </div>
+    </main>
+  </section>
+
+  <!-- ============ MODALE ADMIN ============ -->
+  <div id="adminModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>⚙️ Panneau d'administration</h2>
+        <button id="closeAdminBtn" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="admin-col">
+          <h3>👤 Professeurs</h3>
+          <div id="adminProfs" class="admin-list"></div>
+          <div class="admin-add">
+            <input id="newProfName" class="ipt" placeholder="Nom du prof">
+            <select id="newProfBranch" class="ipt"></select>
+            <button id="addProfBtn" class="btn btn-primary btn-sm">＋</button>
+          </div>
+        </div>
+
+        <div class="admin-col">
+          <h3>🏷️ Branches</h3>
+          <div id="adminBranches" class="admin-list"></div>
+          <div class="admin-add">
+            <input id="newBranchName" class="ipt" placeholder="Nouvelle branche">
+            <button id="addBranchBtn" class="btn btn-primary btn-sm">＋</button>
+          </div>
+        </div>
+
+        <div class="admin-col">
+          <h3>🏆 Rangs</h3>
+          <div id="adminRanks" class="admin-list"></div>
+          <div class="admin-add">
+            <input id="newRankLabel" class="ipt" placeholder="Label (S, A...)">
+            <button id="addRankBtn" class="btn btn-primary btn-sm">＋</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

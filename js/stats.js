@@ -50,9 +50,24 @@ function computeStats(boards) {
     });
   });
 
-  return [...agg.entries()]
-    .map(([name, v]) => ({ name, avg: v.sum / v.count, count: v.count }))
-    .sort((a, b) => b.avg - a.avg || b.count - a.count);
+  const entries = [...agg.entries()]
+    .map(([name, v]) => ({ name, sum: v.sum, avg: v.sum / v.count, count: v.count }));
+  if (!entries.length) return [];
+
+  // --- Moyenne pondérée bayésienne (corrige le biais du petit échantillon) ---
+  // score = (somme_des_scores + C * moyenne_globale) / (nb_classements + C)
+  // Plus un prof est classé par peu de monde, plus son score est tiré vers la
+  // moyenne générale. C = nombre moyen de classements par prof (confiance).
+  const totalCount = entries.reduce((a, e) => a + e.count, 0);
+  const totalSum   = entries.reduce((a, e) => a + e.sum, 0);
+  const globalMean = totalSum / totalCount;
+  const C = Math.max(1, totalCount / entries.length);
+
+  entries.forEach(e => {
+    e.score = (e.sum + C * globalMean) / (e.count + C);
+  });
+
+  return entries.sort((a, b) => b.score - a.score || b.count - a.count);
 }
 
 function renderStats(list) {
@@ -80,11 +95,12 @@ function renderStats(list) {
 
     const main = document.createElement("div");
     main.className = "stat-main";
-    const pct = Math.round(s.avg * 100);
+    const pct = Math.round(s.score * 100);
+    const raw = Math.round(s.avg * 100);
     main.innerHTML =
       `<div class="stat-name">${escapeHtml(s.name)}</div>` +
       `<div class="stat-bar"><span style="width:${pct}%"></span></div>` +
-      `<div class="stat-meta">${pct}% · classé par ${s.count} personne${s.count > 1 ? "s" : ""}</div>`;
+      `<div class="stat-meta">${pct}% pondéré · ${raw}% brut · classé par ${s.count} personne${s.count > 1 ? "s" : ""}</div>`;
 
     row.append(pos, main);
     box.appendChild(row);

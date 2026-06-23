@@ -44,10 +44,30 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     await login(pwd);
     document.getElementById("password").value = "";
   } catch (ex) {
-    err.textContent = "Mot de passe incorrect ❌";
-    console.error(ex);
+    err.textContent = messageFor(ex);
+    console.error("Erreur de connexion :", ex.code, ex.message);
   }
 });
+
+// Traduit le code d'erreur Firebase en message clair
+function messageFor(ex) {
+  switch (ex.code) {
+    case "auth/invalid-credential":
+    case "auth/wrong-password":
+    case "auth/user-not-found":
+      return "Mot de passe incorrect ❌";
+    case "auth/invalid-email":
+      return "E-mail d'accès invalide (vérifie firebase-config.js) ❌";
+    case "auth/operation-not-allowed":
+      return "Active « E-mail/Mot de passe » dans Firebase Auth ⚠️";
+    case "auth/unauthorized-domain":
+      return "Domaine non autorisé : ajoute-le dans Firebase → Auth → Settings ⚠️";
+    case "auth/network-request-failed":
+      return "Problème de réseau 📡";
+    default:
+      return "Erreur : " + (ex.code || ex.message);
+  }
+}
 
 // --- Déconnexion
 document.getElementById("logoutBtn").addEventListener("click", () => logout());

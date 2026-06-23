@@ -3,7 +3,7 @@
 //  Applique les variables CSS et gère les contrôles de l'admin.
 // ============================================================
 
-import { commitBoard, DEFAULT_THEME } from "./store.js?v=3";
+import { commitBoard, DEFAULT_THEME } from "./store.js?v=4";
 
 // Polices proposées (clé = nom affiché, valeur = nom pour Google Fonts)
 export const FONTS = {

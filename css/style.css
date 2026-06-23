@@ -55,6 +55,26 @@ body {
   box-shadow: var(--shadow-sm);
   transition: transform .08s ease, box-shadow .08s ease;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+/* ---------- Icônes (Material Symbols) ---------- */
+.material-symbols-rounded {
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+  line-height: 1;
+  vertical-align: middle;
+  font-size: 1.3em;
+}
+.modal-head h2,
+.bank-head h2,
+.admin-col h3,
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
 .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
@@ -108,6 +128,7 @@ body {
   gap: 14px;
 }
 .login-emoji { font-size: 3.4rem; }
+.login-emoji.material-symbols-rounded { font-size: 3.6rem; color: var(--primary); }
 .login-title { font-size: 1.8rem; font-weight: 700; }
 .login-sub { font-weight: 500; opacity: .7; margin-bottom: 4px; }
 .login-error { color: #e23; font-weight: 600; min-height: 1.2em; }
@@ -340,6 +361,48 @@ body {
   box-shadow: var(--shadow-sm);
 }
 .gallery-card h3 { font-size: 1.1rem; margin-bottom: 10px; word-break: break-word; }
+
+/* ---------- Statistiques ---------- */
+.stats-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-pos {
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+.stat-pos .material-symbols-rounded { font-size: 1.8rem; }
+.stat-pos .gold   { color: #ffba08; }
+.stat-pos .silver { color: #adb5bd; }
+.stat-pos .bronze { color: #cd7f32; }
+.stat-main { flex: 1; min-width: 0; }
+.stat-name { font-weight: 600; }
+.stat-bar {
+  height: 12px;
+  background: #eee;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 5px 0;
+}
+.stat-bar > span { display: block; height: 100%; background: var(--primary); }
+.stat-meta { font-size: .8rem; opacity: .7; }
 
 /* ---------- Affichage des classements ---------- */
 .rankings-view {

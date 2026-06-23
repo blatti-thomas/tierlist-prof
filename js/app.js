@@ -2,12 +2,13 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState, getState, setDisplayName } from "./store.js?v=3";
-import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=3";
-import { renderApp } from "./tierlist.js?v=3";
-import { initAdmin, renderAdmin } from "./admin.js?v=3";
-import { initGallery } from "./galerie.js?v=3";
-import { applyTheme } from "./theme.js?v=3";
+import { initStore, onState, getState, setDisplayName } from "./store.js?v=4";
+import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=4";
+import { renderApp } from "./tierlist.js?v=4";
+import { initAdmin, renderAdmin } from "./admin.js?v=4";
+import { initGallery } from "./galerie.js?v=4";
+import { initStats } from "./stats.js?v=4";
+import { applyTheme } from "./theme.js?v=4";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
@@ -126,3 +127,4 @@ function messageFor(ex) {
 // --- Branchements
 initAdmin();
 initGallery();
+initStats();

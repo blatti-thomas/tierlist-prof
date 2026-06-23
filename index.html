@@ -3,26 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tier List des Profs 🎓</title>
+  <title>Tier List des Profs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,0,0" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- ============ ÉCRAN DE CONNEXION (verrouillage) ============ -->
+  <!-- ============ ÉCRAN DE CONNEXION ============ -->
   <section id="loginScreen" class="login-screen">
     <form id="loginForm" class="login-card">
-      <div class="login-emoji">🎓</div>
+      <span class="material-symbols-rounded login-emoji">school</span>
       <h1 class="login-title">Tier List des Profs</h1>
       <p class="login-sub">Connecte-toi ou crée ton compte pour faire ton classement</p>
       <input type="email" id="email" class="ipt ipt-lg"
              placeholder="E-mail" autocomplete="email" required>
       <input type="password" id="password" class="ipt ipt-lg"
              placeholder="Mot de passe" autocomplete="current-password" required>
-      <button type="submit" class="btn btn-primary btn-block">Se connecter 🚀</button>
-      <button type="button" id="signupBtn" class="btn btn-accent btn-block">Créer un compte ✨</button>
+      <button type="submit" class="btn btn-primary btn-block">
+        <span class="material-symbols-rounded">login</span> Se connecter
+      </button>
+      <button type="button" id="signupBtn" class="btn btn-accent btn-block">
+        <span class="material-symbols-rounded">person_add</span> Créer un compte
+      </button>
       <p id="loginError" class="login-error"></p>
     </form>
   </section>
@@ -30,12 +35,23 @@
   <!-- ============ APPLICATION ============ -->
   <section id="appScreen" class="app-screen hidden">
     <header class="topbar">
-      <h1 class="brand">🎓 Tier List des Profs</h1>
+      <h1 class="brand"><span class="material-symbols-rounded">school</span> Tier List des Profs</h1>
       <div class="topbar-actions">
-        <button id="openProfileBtn" class="btn btn-ghost">👤 <span id="profileName">…</span></button>
-        <button id="openGalleryBtn" class="btn btn-ghost">🌍 Galerie</button>
-        <button id="openAdminBtn" class="btn btn-accent">⚙️ Ma tier list</button>
-        <button id="logoutBtn" class="btn btn-ghost">Déconnexion</button>
+        <button id="openProfileBtn" class="btn btn-ghost">
+          <span class="material-symbols-rounded">account_circle</span> <span id="profileName">…</span>
+        </button>
+        <button id="openStatsBtn" class="btn btn-ghost">
+          <span class="material-symbols-rounded">leaderboard</span> Stats
+        </button>
+        <button id="openGalleryBtn" class="btn btn-ghost">
+          <span class="material-symbols-rounded">collections</span> Galerie
+        </button>
+        <button id="openAdminBtn" class="btn btn-accent">
+          <span class="material-symbols-rounded">tune</span> Ma tier list
+        </button>
+        <button id="logoutBtn" class="btn btn-ghost">
+          <span class="material-symbols-rounded">logout</span>
+        </button>
       </div>
     </header>
 
@@ -44,53 +60,53 @@
 
       <div class="bank-card">
         <div class="bank-head">
-          <h2>🎒 Banque de profs</h2>
+          <h2><span class="material-symbols-rounded">inventory_2</span> Banque de profs</h2>
         </div>
         <div id="bank" class="bank"></div>
-        <p class="hint">Glisse un prof vers un rang. Dans un rang, glisse-le à gauche/droite pour l'ordonner 👇</p>
+        <p class="hint">Glisse un prof vers un rang. Dans un rang, glisse-le à gauche/droite pour l'ordonner.</p>
       </div>
     </main>
   </section>
 
-  <!-- ============ MODALE ADMIN ============ -->
+  <!-- ============ MODALE « MA TIER LIST » ============ -->
   <div id="adminModal" class="modal">
     <div class="modal-card">
       <div class="modal-head">
-        <h2>⚙️ Ma tier list — profs, cours, catégories, apparence</h2>
-        <button id="closeAdminBtn" class="btn btn-ghost btn-sm">✕</button>
+        <h2><span class="material-symbols-rounded">tune</span> Ma tier list — profs, cours, catégories, apparence</h2>
+        <button id="closeAdminBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
       </div>
       <div class="modal-body">
 
         <div class="admin-col">
-          <h3>👤 Professeurs</h3>
+          <h3><span class="material-symbols-rounded">person</span> Professeurs</h3>
           <div id="adminProfs" class="admin-list"></div>
           <div class="admin-add">
             <input id="newProfName" class="ipt" placeholder="Nom du prof">
             <select id="newProfBranch" class="ipt"></select>
-            <button id="addProfBtn" class="btn btn-primary btn-sm">＋</button>
+            <button id="addProfBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
           </div>
         </div>
 
         <div class="admin-col">
-          <h3>🏷️ Branches</h3>
+          <h3><span class="material-symbols-rounded">menu_book</span> Cours / branches</h3>
           <div id="adminBranches" class="admin-list"></div>
           <div class="admin-add">
-            <input id="newBranchName" class="ipt" placeholder="Nouvelle branche">
-            <button id="addBranchBtn" class="btn btn-primary btn-sm">＋</button>
+            <input id="newBranchName" class="ipt" placeholder="Nouveau cours">
+            <button id="addBranchBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
           </div>
         </div>
 
         <div class="admin-col">
-          <h3>🏆 Rangs</h3>
+          <h3><span class="material-symbols-rounded">military_tech</span> Catégories / rangs</h3>
           <div id="adminRanks" class="admin-list"></div>
           <div class="admin-add">
             <input id="newRankLabel" class="ipt" placeholder="Label (S, A...)">
-            <button id="addRankBtn" class="btn btn-primary btn-sm">＋</button>
+            <button id="addRankBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
           </div>
         </div>
 
         <div class="admin-col admin-col-wide">
-          <h3>🎨 Apparence</h3>
+          <h3><span class="material-symbols-rounded">palette</span> Apparence</h3>
           <div class="theme-grid">
             <label><span class="cap">Police</span>
               <select id="themeFont" class="ipt"></select>
@@ -114,36 +130,40 @@
               <input type="color" id="themeAccent" class="ipt-color">
             </label>
           </div>
-          <button id="themeResetBtn" class="btn btn-ghost btn-sm">↺ Réinitialiser l'apparence</button>
+          <button id="themeResetBtn" class="btn btn-ghost btn-sm">
+            <span class="material-symbols-rounded">restart_alt</span> Réinitialiser l'apparence
+          </button>
         </div>
 
       </div>
     </div>
   </div>
 
-  <!-- ============ MODALE PROFIL (tout le monde) ============ -->
+  <!-- ============ MODALE PROFIL ============ -->
   <div id="profileModal" class="modal">
     <div class="modal-card modal-card-sm">
       <div class="modal-head">
-        <h2>👤 Mon profil</h2>
-        <button id="closeProfileBtn" class="btn btn-ghost btn-sm">✕</button>
+        <h2><span class="material-symbols-rounded">account_circle</span> Mon profil</h2>
+        <button id="closeProfileBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
       </div>
       <div class="modal-body modal-body-sm">
         <label class="profile-field">Ton pseudo
           <input id="profilePseudo" class="ipt" placeholder="Ton pseudo" maxlength="40">
         </label>
-        <button id="saveProfileBtn" class="btn btn-primary btn-block">💾 Enregistrer</button>
+        <button id="saveProfileBtn" class="btn btn-primary btn-block">
+          <span class="material-symbols-rounded">save</span> Enregistrer
+        </button>
         <p id="profileMsg" class="hint"></p>
       </div>
     </div>
   </div>
 
-  <!-- ============ MODALE GALERIE (commune) ============ -->
+  <!-- ============ MODALE GALERIE ============ -->
   <div id="galleryModal" class="modal">
     <div class="modal-card">
       <div class="modal-head">
-        <h2>🌍 Galerie — les tier lists de tout le monde</h2>
-        <button id="closeGalleryBtn" class="btn btn-ghost btn-sm">✕</button>
+        <h2><span class="material-symbols-rounded">collections</span> Galerie — les tier lists de tout le monde</h2>
+        <button id="closeGalleryBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
       </div>
       <div class="modal-body">
         <div id="galleryContent" class="gallery-grid"></div>
@@ -151,6 +171,20 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=3"></script>
+  <!-- ============ MODALE STATISTIQUES ============ -->
+  <div id="statsModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2><span class="material-symbols-rounded">leaderboard</span> Statistiques — les profs les mieux classés</h2>
+        <button id="closeStatsBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
+      </div>
+      <div class="modal-body">
+        <p class="hint">Score moyen normalisé sur tous les classements (100% = tout en haut chez tout le monde), indépendant du nombre de catégories.</p>
+        <div id="statsContent" class="stats-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js?v=4"></script>
 </body>
 </html>

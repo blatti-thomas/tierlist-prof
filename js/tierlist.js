@@ -3,8 +3,8 @@
 //  Lit la config partagée + le classement perso ordonné (tiers).
 // ============================================================
 
-import { getState, moveProf } from "./store.js?v=3";
-import { escapeHtml } from "./util.js?v=3";
+import { getState, moveProf } from "./store.js?v=4";
+import { escapeHtml } from "./util.js?v=4";
 
 const BANK_ZONE = "__bank__";
 
@@ -75,7 +75,7 @@ function renderBank() {
   if (list.length === 0) {
     const empty = document.createElement("p");
     empty.className = "bank-empty";
-    empty.textContent = "Tous les profs sont classés 🎉";
+    empty.textContent = "Tous les profs sont classés.";
     bank.appendChild(empty);
   } else {
     list.forEach(p => bank.appendChild(makeChip(p)));

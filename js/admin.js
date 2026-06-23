@@ -3,9 +3,9 @@
 //  CRUD profs / branches / rangs + apparence
 // ============================================================
 
-import { getState, commitBoard, uid } from "./store.js?v=3";
-import { escapeHtml, randomColor } from "./util.js?v=3";
-import { initThemeControls, renderThemeControls } from "./theme.js?v=3";
+import { getState, commitBoard, uid } from "./store.js?v=4";
+import { escapeHtml, randomColor, icon } from "./util.js?v=4";
+import { initThemeControls, renderThemeControls } from "./theme.js?v=4";
 
 export function initAdmin() {
   document.getElementById("openAdminBtn").onclick = openAdmin;
@@ -82,7 +82,7 @@ function renderProfAdmin(board) {
 
     const del = document.createElement("button");
     del.className = "btn btn-danger btn-sm";
-    del.textContent = "✕";
+    del.append(icon("delete"));
     del.onclick = () => commitBoard(d => {
       d.professors = d.professors.filter(x => x.id !== p.id);
     });
@@ -111,7 +111,7 @@ function renderBranchAdmin(board) {
 
     const del = document.createElement("button");
     del.className = "btn btn-danger btn-sm";
-    del.textContent = "✕";
+    del.append(icon("delete"));
     del.onclick = () => commitBoard(d => {
       d.branches = d.branches.filter(x => x.id !== b.id);
       d.professors.forEach(p => { if (p.branchId === b.id) p.branchId = ""; });
@@ -150,7 +150,7 @@ function renderRankAdmin(board) {
 
     const up = document.createElement("button");
     up.className = "btn btn-ghost btn-sm";
-    up.textContent = "▲";
+    up.append(icon("keyboard_arrow_up"));
     up.disabled = i === 0;
     up.onclick = () => commitBoard(d => {
       [d.ranks[i - 1], d.ranks[i]] = [d.ranks[i], d.ranks[i - 1]];
@@ -158,7 +158,7 @@ function renderRankAdmin(board) {
 
     const down = document.createElement("button");
     down.className = "btn btn-ghost btn-sm";
-    down.textContent = "▼";
+    down.append(icon("keyboard_arrow_down"));
     down.disabled = i === board.ranks.length - 1;
     down.onclick = () => commitBoard(d => {
       [d.ranks[i + 1], d.ranks[i]] = [d.ranks[i], d.ranks[i + 1]];
@@ -166,7 +166,7 @@ function renderRankAdmin(board) {
 
     const del = document.createElement("button");
     del.className = "btn btn-danger btn-sm";
-    del.textContent = "✕";
+    del.append(icon("delete"));
     del.onclick = () => commitBoard(d => {
       d.ranks = d.ranks.filter(x => x.id !== r.id);
       if (d.tiers) delete d.tiers[r.id];

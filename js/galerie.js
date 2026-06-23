@@ -2,8 +2,8 @@
 //  GALERIE COMMUNE — voir les tier lists de tout le monde
 // ============================================================
 
-import { loadAllBoards } from "./store.js?v=3";
-import { escapeHtml } from "./util.js?v=3";
+import { loadAllBoards } from "./store.js?v=4";
+import { escapeHtml } from "./util.js?v=4";
 
 export function initGallery() {
   document.getElementById("openGalleryBtn").onclick = openGallery;

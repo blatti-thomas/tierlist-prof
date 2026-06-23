@@ -79,13 +79,22 @@ export const DEFAULT_CONFIG = {
 // ============================================================
 let state = {
   config: null,        // { theme, branches, ranks, professors }
-  placements: {},      // classement personnel : profId -> rankId
+  tiers: {},           // classement perso ORDONNÉ : rankId -> [profId, profId, ...]
   isAdmin: false,
   displayName: "",
   uid: null,
   ready: false,
   error: null
 };
+
+// Convertit l'ancien format { profId: rankId } vers le nouveau { rankId: [profId] }
+export function tiersFromPlacements(placements) {
+  const t = {};
+  Object.entries(placements || {}).forEach(([profId, rankId]) => {
+    (t[rankId] = t[rankId] || []).push(profId);
+  });
+  return t;
+}
 
 const listeners = new Set();
 export function getState() { return state; }
@@ -142,16 +151,22 @@ export async function initStore(user, admin) {
     if (!rsnap.exists()) {
       await setDoc(userRef, {
         displayName: state.displayName,
-        placements: {},
+        tiers: {},
         updatedAt: serverTimestamp()
       });
+    } else {
+      const d = rsnap.data();
+      state.tiers = d.tiers || tiersFromPlacements(d.placements);
+      if (d.displayName) state.displayName = d.displayName; // le classement fait foi
     }
   } catch (e) {
     console.error("❌ Init classement :", e);
   }
   onSnapshot(userRef, (s) => {
     if (!s.exists()) return;
-    state.placements = s.data().placements || {};
+    const d = s.data();
+    state.tiers = d.tiers || tiersFromPlacements(d.placements);
+    if (d.displayName) state.displayName = d.displayName;
     emit();
   }, (err) => console.error("❌ Lecture classement :", err));
 }
@@ -174,25 +189,41 @@ export function commitConfig(mutator) {
 }
 
 // ============================================================
-//  PLACEMENT D'UN PROF (classement personnel de l'utilisateur)
+//  DÉPLACER UN PROF dans un rang à une position précise
 //  rankId = null  → renvoyé dans la banque
+//  index          → position dans le rang (0 = tout à gauche)
 // ============================================================
-export function setPlacement(profId, rankId) {
-  const p = { ...state.placements };
-  if (rankId == null) delete p[profId];
-  else p[profId] = rankId;
-  state.placements = p;
+export function moveProf(profId, rankId, index) {
+  const tiers = structuredClone(state.tiers);
+
+  // retire le prof de tous les rangs
+  for (const k of Object.keys(tiers)) {
+    tiers[k] = (tiers[k] || []).filter(id => id !== profId);
+    if (!tiers[k].length) delete tiers[k];
+  }
+
+  // l'insère à la bonne position (sauf retour banque)
+  if (rankId != null) {
+    const arr = tiers[rankId] || [];
+    const i = Math.max(0, Math.min(index == null ? arr.length : index, arr.length));
+    arr.splice(i, 0, profId);
+    tiers[rankId] = arr;
+  }
+
+  state.tiers = tiers;
   emit();
   clearTimeout(rankSaveTimer);
-  rankSaveTimer = setTimeout(async () => {
-    try {
-      await setDoc(userRef, {
-        displayName: state.displayName,
-        placements: state.placements,
-        updatedAt: serverTimestamp()
-      });
-    } catch (e) { console.error("❌ Sauvegarde classement :", e); }
+  rankSaveTimer = setTimeout(() => {
+    saveRankingNow().catch(e => console.error("❌ Sauvegarde classement :", e));
   }, 300);
+}
+
+function saveRankingNow() {
+  return setDoc(userRef, {
+    displayName: state.displayName,
+    tiers: state.tiers,
+    updatedAt: serverTimestamp()
+  });
 }
 
 // ============================================================
@@ -203,13 +234,7 @@ export async function setDisplayName(name) {
   if (!clean || !userRef) return;
   state.displayName = clean;
   emit();
-  try {
-    await setDoc(userRef, {
-      displayName: clean,
-      placements: state.placements,
-      updatedAt: serverTimestamp()
-    });
-  } catch (e) { console.error("❌ Sauvegarde pseudo :", e); }
+  await saveRankingNow();   // les erreurs remontent à l'appelant (affichées dans la modale)
 }
 
 // ============================================================

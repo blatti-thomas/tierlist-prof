@@ -88,9 +88,15 @@ document.getElementById("closeProfileBtn").addEventListener("click", () => {
 document.getElementById("saveProfileBtn").addEventListener("click", async () => {
   const name = profilePseudo.value.trim();
   if (!name) { profileMsg.textContent = "Entre un pseudo 😉"; return; }
-  await setDisplayName(name);   // classement (vu par l'admin)
-  await setProfileName(name);   // profil Firebase (prochaines connexions)
-  profileMsg.textContent = "Pseudo enregistré ✅";
+  profileMsg.textContent = "Enregistrement…";
+  try {
+    await setDisplayName(name);   // classement (vu par l'admin)
+    await setProfileName(name);   // profil Firebase (prochaines connexions)
+    profileMsg.textContent = "Pseudo enregistré ✅";
+  } catch (e) {
+    console.error("Pseudo :", e);
+    profileMsg.textContent = "Erreur : " + (e.code || e.message);
+  }
 });
 
 // Traduit les codes d'erreur Firebase en messages clairs

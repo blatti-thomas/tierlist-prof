@@ -3,7 +3,7 @@
 //  CRUD profs / branches / rangs + apparence + classements
 // ============================================================
 
-import { getState, commitConfig, uid, loadAllRankings } from "./store.js";
+import { getState, commitConfig, uid, loadAllRankings, tiersFromPlacements } from "./store.js";
 import { escapeHtml, randomColor } from "./util.js";
 import { initThemeControls, renderThemeControls } from "./theme.js";
 
@@ -213,9 +213,12 @@ function renderAllRankings(list) {
     title.textContent = u.displayName || u.uid;
     card.appendChild(title);
 
+    const tiers = u.tiers || tiersFromPlacements(u.placements);
+
     config.ranks.forEach(rank => {
-      const profs = config.professors
-        .filter(p => (u.placements || {})[p.id] === rank.id)
+      const profs = (tiers[rank.id] || [])
+        .map(id => config.professors.find(p => p.id === id))
+        .filter(Boolean)
         .map(p => p.name);
 
       const row = document.createElement("div");

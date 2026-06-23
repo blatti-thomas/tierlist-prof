@@ -1,13 +1,12 @@
 // ============================================================
-//  TIER LIST — Rendu + Glisser/Déposer (PC + tactile)
-//  Lit la config partagée et écrit dans le classement perso.
+//  TIER LIST — Rendu ordonné + Glisser/Déposer (PC + tactile)
+//  Lit la config partagée + le classement perso ordonné (tiers).
 // ============================================================
 
-import { getState, setPlacement } from "./store.js";
+import { getState, moveProf } from "./store.js";
 import { escapeHtml } from "./util.js";
 
 const BANK_ZONE = "__bank__";
-let bankFilter = "__all__";
 
 // ------------------------------------------------------------
 //  RENDU PRINCIPAL
@@ -26,12 +25,15 @@ export function renderApp() {
     return;
   }
   renderTiers();
-  renderBankFilter();
   renderBank();
 }
 
+function profById(id) {
+  return getState().config.professors.find(p => p.id === id);
+}
+
 function renderTiers() {
-  const { config, placements } = getState();
+  const { config, tiers } = getState();
   const wrap = document.getElementById("tierRows");
   wrap.innerHTML = "";
 
@@ -48,9 +50,10 @@ function renderTiers() {
     zone.className = "tier-zone dropzone";
     zone.dataset.drop = rank.id;
 
-    config.professors
-      .filter(p => placements[p.id] === rank.id)
-      .forEach(p => zone.appendChild(makeChip(p)));
+    (tiers[rank.id] || []).forEach(profId => {
+      const p = profById(profId);
+      if (p) zone.appendChild(makeChip(p));
+    });
 
     row.append(label, zone);
     wrap.appendChild(row);
@@ -58,40 +61,24 @@ function renderTiers() {
 }
 
 function renderBank() {
-  const { config, placements } = getState();
+  const { config, tiers } = getState();
   const bank = document.getElementById("bank");
   bank.innerHTML = "";
   bank.classList.add("dropzone");
   bank.dataset.drop = BANK_ZONE;
 
-  const list = config.professors.filter(p =>
-    !placements[p.id] &&
-    (bankFilter === "__all__" || p.branchId === bankFilter)
-  );
+  // profs présents dans aucun rang
+  const placed = new Set(Object.values(tiers).flat());
+  const list = config.professors.filter(p => !placed.has(p.id));
 
   if (list.length === 0) {
     const empty = document.createElement("p");
     empty.className = "bank-empty";
-    empty.textContent = "Aucun prof ici 🎉";
+    empty.textContent = "Tous les profs sont classés 🎉";
     bank.appendChild(empty);
   } else {
     list.forEach(p => bank.appendChild(makeChip(p)));
   }
-}
-
-function renderBankFilter() {
-  const { config } = getState();
-  const sel = document.getElementById("bankFilter");
-  const current = bankFilter;
-  sel.innerHTML =
-    `<option value="__all__">Toutes les branches</option>` +
-    config.branches.map(b => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join("");
-
-  bankFilter = (current === "__all__" || config.branches.some(b => b.id === current))
-    ? current : "__all__";
-  sel.value = bankFilter;
-
-  sel.onchange = () => { bankFilter = sel.value; renderBank(); };
 }
 
 function makeChip(p) {
@@ -166,6 +153,17 @@ function highlightZone(x, y) {
   if (zone) zone.classList.add("drop-hover");
 }
 
+// Position d'insertion dans une zone, selon la position du pointeur
+function insertIndexAt(zone, x, y) {
+  const chips = [...zone.querySelectorAll(".chip")].filter(c => !c.classList.contains("chip-dragging"));
+  for (let i = 0; i < chips.length; i++) {
+    const r = chips[i].getBoundingClientRect();
+    if (y < r.top) return i;                              // pointeur au-dessus de cette ligne
+    if (y <= r.bottom && x < r.left + r.width / 2) return i; // avant ce prof dans sa ligne
+  }
+  return chips.length;
+}
+
 function onUp(e) {
   window.removeEventListener("pointermove", onMove);
   window.removeEventListener("pointerup", onUp);
@@ -182,7 +180,12 @@ function onUp(e) {
 
   if (zone) {
     const target = zone.dataset.drop;
-    setPlacement(d.profId, target === BANK_ZONE ? null : target);
+    if (target === BANK_ZONE) {
+      moveProf(d.profId, null);
+    } else {
+      const index = insertIndexAt(zone, e.clientX, e.clientY);
+      moveProf(d.profId, target, index);
+    }
   } else {
     d.chip.classList.remove("chip-dragging");
   }

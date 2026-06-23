@@ -228,7 +228,7 @@ body {
 .chip-name { font-weight: 600; font-size: 1rem; }
 .chip-branch { font-size: .72rem; font-weight: 500; opacity: .6; }
 
-.chip-dragging { opacity: .25; }
+.chip-dragging { display: none; }
 .chip-ghost {
   position: fixed;
   z-index: 1000;

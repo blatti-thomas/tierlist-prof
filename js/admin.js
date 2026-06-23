@@ -3,9 +3,9 @@
 //  CRUD profs / branches / rangs + apparence
 // ============================================================
 
-import { getState, commitBoard, uid } from "./store.js?v=4";
-import { escapeHtml, randomColor, icon } from "./util.js?v=4";
-import { initThemeControls, renderThemeControls } from "./theme.js?v=4";
+import { getState, commitBoard, uid } from "./store.js?v=5";
+import { escapeHtml, randomColor, icon } from "./util.js?v=5";
+import { initThemeControls, renderThemeControls } from "./theme.js?v=5";
 
 export function initAdmin() {
   document.getElementById("openAdminBtn").onclick = openAdmin;

@@ -3,8 +3,8 @@
 //  Lit la config partagée + le classement perso ordonné (tiers).
 // ============================================================
 
-import { getState, moveProf } from "./store.js?v=4";
-import { escapeHtml } from "./util.js?v=4";
+import { getState, moveProf } from "./store.js?v=5";
+import { escapeHtml } from "./util.js?v=5";
 
 const BANK_ZONE = "__bank__";
 

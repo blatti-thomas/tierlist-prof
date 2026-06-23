@@ -46,6 +46,9 @@
         <button id="openGalleryBtn" class="btn btn-ghost">
           <span class="material-symbols-rounded">collections</span> Galerie
         </button>
+        <button id="openPropsBtn" class="btn btn-ghost">
+          <span class="material-symbols-rounded">inbox</span> Propositions
+        </button>
         <button id="openAdminBtn" class="btn btn-accent">
           <span class="material-symbols-rounded">tune</span> Ma tier list
         </button>
@@ -185,6 +188,30 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=4"></script>
+  <!-- ============ MODALE PROPOSITIONS ============ -->
+  <div id="propsModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2><span class="material-symbols-rounded">inbox</span> Propositions des autres</h2>
+        <button id="closePropsBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="admin-col">
+          <h3><span class="material-symbols-rounded">person</span> Profs proposés</h3>
+          <div id="propProfs" class="prop-list"></div>
+        </div>
+        <div class="admin-col">
+          <h3><span class="material-symbols-rounded">menu_book</span> Cours proposés</h3>
+          <div id="propBranches" class="prop-list"></div>
+        </div>
+        <div class="admin-col">
+          <h3><span class="material-symbols-rounded">military_tech</span> Catégories proposées</h3>
+          <div id="propRanks" class="prop-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js?v=5"></script>
 </body>
 </html>

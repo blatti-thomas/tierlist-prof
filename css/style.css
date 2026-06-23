@@ -362,6 +362,36 @@ body {
 }
 .gallery-card h3 { font-size: 1.1rem; margin-bottom: 10px; word-break: break-word; }
 
+/* ---------- Propositions ---------- */
+.prop-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.prop-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+.prop-info {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  font-size: .9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.prop-by { font-size: .72rem; opacity: .6; white-space: nowrap; }
+.prop-swatch {
+  width: 16px; height: 16px;
+  flex: 0 0 16px;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  display: inline-block;
+}
+
 /* ---------- Statistiques ---------- */
 .stats-content {
   width: 100%;

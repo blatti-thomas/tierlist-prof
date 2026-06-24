@@ -168,32 +168,26 @@ body {
 
 .tier-row {
   display: flex;
-  align-items: stretch;
-  gap: 10px;
+  flex-direction: column;       /* titre en haut, zone de dépôt en dessous */
   border: var(--border);
   border-radius: var(--radius);
   background: #fff;
   box-shadow: var(--shadow);
-  min-height: 84px;
-  padding: 10px;
+  overflow: hidden;
 }
 .tier-label {
-  /* Badge coloré arrondi (plus de coins droits contre la zone) */
-  /* Largeur automatique : s'ajuste à la longueur du texte (avec garde-fous) */
-  flex: 0 0 auto;
-  width: auto;
-  min-width: 60px;
-  max-width: 280px;
-  display: grid;
-  place-items: center;
-  font-size: clamp(0.85rem, 2.2vw, 1.8rem);
-  line-height: 1.05;
+  /* En-tête colorée : le nom de la catégorie s'affiche en grand, en haut */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.2rem, 4.5vw, 2.1rem);
+  line-height: 1.1;
   font-weight: 700;
   color: #fff;
   text-shadow: 2px 2px 0 rgba(0,0,0,.35);
-  border: 3px solid var(--ink);
-  border-radius: var(--radius-sm);
-  padding: 8px 14px;
+  border-bottom: var(--border);
+  padding: 10px 16px;
   overflow-wrap: anywhere;
   text-align: center;
   user-select: none;
@@ -201,13 +195,14 @@ body {
   -webkit-touch-callout: none;
 }
 .tier-zone {
+  width: 100%;
   flex: 1;
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 10px;
-  padding: 2px;
-  border-radius: var(--radius-sm);
+  padding: 12px;
+  min-height: 64px;
   transition: background .12s ease;
 }
 
@@ -681,15 +676,8 @@ body {
 
 @media (max-width: 560px) {
   .brand { font-size: 1.15rem; }
-  /* Le libellé s'ajuste à son contenu (un mot court comme « GOAT » reste sur
-     une ligne) ; il ne se coupe qu'au-delà de 32% de la largeur de l'écran. */
-  .tier-label {
-    flex-basis: auto;
-    min-width: 50px;
-    max-width: 32vw;
-    font-size: 1.15rem;
-    padding: 8px 10px;
-  }
+  /* En-tête de catégorie pleine largeur : le titre reste lisible et en grand */
+  .tier-label { font-size: clamp(1.1rem, 6vw, 1.7rem); padding: 8px 12px; }
   .login-card { padding: 26px 20px; }
   .btn { font-size: .92rem; padding: 9px 14px; }
 

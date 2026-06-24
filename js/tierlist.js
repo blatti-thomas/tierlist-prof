@@ -103,6 +103,37 @@ function makeChip(p) {
 let drag = null;
 const THRESHOLD = 6;
 
+// --- Défilement automatique quand le doigt s'approche d'un bord de l'écran ---
+// (indispensable sur mobile : on ne peut pas scroller la page en draggant,
+//  donc on fait défiler tout seul pour atteindre les rangs en haut.)
+const EDGE = 90;        // hauteur de la zone (en px) qui déclenche le défilement
+const MAX_SPEED = 16;   // vitesse max (px par frame)
+let lastPointer = { x: 0, y: 0 };
+let autoScrollRAF = null;
+
+function startAutoScroll() {
+  if (autoScrollRAF) return;
+  const step = () => {
+    if (!drag || !drag.active) { autoScrollRAF = null; return; }
+    const { y, x } = lastPointer;
+    const h = window.innerHeight;
+    let dy = 0;
+    if (y < EDGE)            dy = -MAX_SPEED * (1 - y / EDGE);
+    else if (y > h - EDGE)   dy =  MAX_SPEED * (1 - (h - y) / EDGE);
+    if (dy !== 0) {
+      window.scrollBy(0, dy);
+      highlightZone(x, y);   // la zone sous le doigt change pendant le défilement
+    }
+    autoScrollRAF = requestAnimationFrame(step);
+  };
+  autoScrollRAF = requestAnimationFrame(step);
+}
+
+function stopAutoScroll() {
+  if (autoScrollRAF) cancelAnimationFrame(autoScrollRAF);
+  autoScrollRAF = null;
+}
+
 function startDrag(e, profId) {
   if (e.pointerType === "mouse" && e.button !== 0) return;
   drag = {
@@ -121,6 +152,8 @@ function onMove(e) {
     if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < THRESHOLD) return;
     beginGhost(e);
   }
+  lastPointer.x = e.clientX;
+  lastPointer.y = e.clientY;
   drag.ghost.style.left = (e.clientX - drag.offsetX) + "px";
   drag.ghost.style.top  = (e.clientY - drag.offsetY) + "px";
   highlightZone(e.clientX, e.clientY);
@@ -141,6 +174,9 @@ function beginGhost(e) {
 
   drag.ghost = ghost;
   drag.chip.classList.add("chip-dragging");
+  lastPointer.x = e.clientX;
+  lastPointer.y = e.clientY;
+  startAutoScroll();
 }
 
 function zoneAt(x, y) {
@@ -169,6 +205,7 @@ function onUp(e) {
   window.removeEventListener("pointermove", onMove);
   window.removeEventListener("pointerup", onUp);
   window.removeEventListener("pointercancel", onUp);
+  stopAutoScroll();
   if (!drag) return;
 
   const d = drag;

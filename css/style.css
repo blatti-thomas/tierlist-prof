@@ -26,7 +26,12 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: var(--base-size); }
+html {
+  font-size: var(--base-size);
+  background: var(--paper);        /* évite un fond blanc si on « tire » la page */
+  /* Bloque l'effet élastique / pull-to-refresh aux limites (mobile) */
+  overscroll-behavior: none;
+}
 
 body {
   font-family: var(--font);
@@ -37,6 +42,7 @@ body {
     radial-gradient(circle at 50% 92%, #fff2c2 0, transparent 45%),
     var(--paper);
   min-height: 100vh;
+  overscroll-behavior: none;
 }
 
 .hidden { display: none !important; }
@@ -163,19 +169,20 @@ body {
 .tier-row {
   display: flex;
   align-items: stretch;
-  gap: 0;
+  gap: 10px;
   border: var(--border);
   border-radius: var(--radius);
   background: #fff;
   box-shadow: var(--shadow);
-  overflow: hidden;
   min-height: 84px;
+  padding: 10px;
 }
 .tier-label {
+  /* Badge coloré arrondi (plus de coins droits contre la zone) */
   /* Largeur automatique : s'ajuste à la longueur du texte (avec garde-fous) */
   flex: 0 0 auto;
   width: auto;
-  min-width: 64px;
+  min-width: 60px;
   max-width: 280px;
   display: grid;
   place-items: center;
@@ -184,10 +191,14 @@ body {
   font-weight: 700;
   color: #fff;
   text-shadow: 2px 2px 0 rgba(0,0,0,.35);
-  border-right: var(--border);
-  padding: 8px 16px;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
   overflow-wrap: anywhere;
   text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .tier-zone {
   flex: 1;
@@ -195,7 +206,8 @@ body {
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 10px;
-  padding: 12px;
+  padding: 2px;
+  border-radius: var(--radius-sm);
   transition: background .12s ease;
 }
 
@@ -241,6 +253,9 @@ body {
   padding: 8px 12px;
   cursor: grab;
   user-select: none;
+  -webkit-user-select: none;     /* iOS : empêche la sélection bleue du texte */
+  -webkit-touch-callout: none;   /* iOS : pas de menu au appui long */
+  -webkit-tap-highlight-color: transparent;
   touch-action: none;            /* indispensable pour le drag tactile */
   transition: transform .08s ease;
 }

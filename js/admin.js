@@ -11,6 +11,7 @@ export function initAdmin() {
   document.getElementById("openAdminBtn").onclick = openAdmin;
   document.getElementById("closeAdminBtn").onclick = closeAdmin;
   initThemeControls();
+  initAccordion();
 
   document.getElementById("addProfBtn").onclick = () => {
     const name = document.getElementById("newProfName").value.trim();
@@ -33,6 +34,16 @@ export function initAdmin() {
     commitBoard(d => d.ranks.push({ id: uid("r"), label, color: randomColor() }));
     document.getElementById("newRankLabel").value = "";
   };
+}
+
+// Sur mobile, chaque section (profs / cours / catégories / apparence) est un
+// menu déroulant : on clique l'en-tête pour l'ouvrir/fermer (évite de scroller).
+function initAccordion() {
+  document.querySelectorAll("#adminModal .admin-col .acc-head").forEach(head => {
+    head.addEventListener("click", () => {
+      head.closest(".admin-col").classList.toggle("collapsed");
+    });
+  });
 }
 
 export function openAdmin() {

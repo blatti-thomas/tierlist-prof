@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,0,0" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/style.css?v=9">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
@@ -81,36 +81,43 @@
       </div>
       <div class="modal-body">
 
-        <div class="admin-col">
-          <h3><span class="material-symbols-rounded">person</span> Professeurs</h3>
-          <div id="adminProfs" class="admin-list"></div>
-          <div class="admin-add">
-            <input id="newProfName" class="ipt" placeholder="Nom du prof">
-            <select id="newProfBranch" class="ipt"></select>
-            <button id="addProfBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
+        <div class="admin-col collapsed">
+          <h3 class="acc-head"><span class="acc-title"><span class="material-symbols-rounded">person</span> Professeurs</span><span class="material-symbols-rounded acc-chevron">expand_more</span></h3>
+          <div class="acc-body">
+            <div id="adminProfs" class="admin-list"></div>
+            <div class="admin-add">
+              <input id="newProfName" class="ipt" placeholder="Nom du prof">
+              <select id="newProfBranch" class="ipt"></select>
+              <button id="addProfBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
+            </div>
           </div>
         </div>
 
-        <div class="admin-col">
-          <h3><span class="material-symbols-rounded">menu_book</span> Cours / branches</h3>
-          <div id="adminBranches" class="admin-list"></div>
-          <div class="admin-add">
-            <input id="newBranchName" class="ipt" placeholder="Nouveau cours">
-            <button id="addBranchBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
+        <div class="admin-col collapsed">
+          <h3 class="acc-head"><span class="acc-title"><span class="material-symbols-rounded">menu_book</span> Cours / branches</span><span class="material-symbols-rounded acc-chevron">expand_more</span></h3>
+          <div class="acc-body">
+            <div id="adminBranches" class="admin-list"></div>
+            <div class="admin-add">
+              <input id="newBranchName" class="ipt" placeholder="Nouveau cours">
+              <button id="addBranchBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
+            </div>
           </div>
         </div>
 
-        <div class="admin-col">
-          <h3><span class="material-symbols-rounded">military_tech</span> Catégories / rangs</h3>
-          <div id="adminRanks" class="admin-list"></div>
-          <div class="admin-add">
-            <input id="newRankLabel" class="ipt" placeholder="Label (S, A...)">
-            <button id="addRankBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
+        <div class="admin-col collapsed">
+          <h3 class="acc-head"><span class="acc-title"><span class="material-symbols-rounded">military_tech</span> Catégories / rangs</span><span class="material-symbols-rounded acc-chevron">expand_more</span></h3>
+          <div class="acc-body">
+            <div id="adminRanks" class="admin-list"></div>
+            <div class="admin-add">
+              <input id="newRankLabel" class="ipt" placeholder="Label (S, A...)">
+              <button id="addRankBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
+            </div>
           </div>
         </div>
 
-        <div class="admin-col admin-col-wide">
-          <h3><span class="material-symbols-rounded">palette</span> Apparence</h3>
+        <div class="admin-col admin-col-wide collapsed">
+          <h3 class="acc-head"><span class="acc-title"><span class="material-symbols-rounded">palette</span> Apparence</span><span class="material-symbols-rounded acc-chevron">expand_more</span></h3>
+          <div class="acc-body">
           <div class="theme-grid">
             <label><span class="cap">Police</span>
               <select id="themeFont" class="ipt"></select>
@@ -137,6 +144,7 @@
           <button id="themeResetBtn" class="btn btn-ghost btn-sm">
             <span class="material-symbols-rounded">restart_alt</span> Réinitialiser l'apparence
           </button>
+          </div>
         </div>
 
       </div>
@@ -183,28 +191,45 @@
         <button id="closeStatsBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
       </div>
       <div class="modal-body">
-        <p class="hint">Score pondéré : tient compte du <strong>nombre de personnes</strong> qui ont classé le prof (un prof noté par beaucoup de monde compte plus qu'un noté par une seule personne) et reste indépendant du nombre de catégories.</p>
+        <nav id="statsTabs" class="tabs">
+          <button class="tab tab-active" data-tab="podium"><span class="material-symbols-rounded">emoji_events</span> Podium</button>
+          <button class="tab" data-tab="classement"><span class="material-symbols-rounded">format_list_numbered</span> Classement</button>
+          <button class="tab" data-tab="graphes"><span class="material-symbols-rounded">insights</span> Graphiques</button>
+        </nav>
 
-        <div id="statsCharts" class="stats-charts">
-          <div class="stats-chart-card">
-            <h3><span class="material-symbols-rounded">bar_chart</span> Nombre de votes par prof</h3>
-            <div class="canvas-wrap"><canvas id="chartVotes"></canvas></div>
-          </div>
-          <div class="stats-chart-card">
-            <h3><span class="material-symbols-rounded">pie_chart</span> Répartition des votes</h3>
-            <div class="canvas-wrap"><canvas id="chartPie"></canvas></div>
-          </div>
-          <div class="stats-chart-card">
-            <h3><span class="material-symbols-rounded">radar</span> Comparaison du top (toile d'araignée)</h3>
-            <div class="canvas-wrap"><canvas id="chartRadar"></canvas></div>
-          </div>
-          <div class="stats-chart-card">
-            <h3><span class="material-symbols-rounded">scatter_plot</span> Popularité vs note</h3>
-            <div class="canvas-wrap"><canvas id="chartScatter"></canvas></div>
-          </div>
+        <!-- Onglet PODIUM -->
+        <div class="tab-panel tab-panel-active" data-panel="podium">
+          <div id="podium" class="podium"></div>
+          <div id="podiumDetail" class="podium-detail"></div>
         </div>
 
-        <div id="statsContent" class="stats-content"></div>
+        <!-- Onglet CLASSEMENT -->
+        <div class="tab-panel" data-panel="classement">
+          <p class="hint">Score pondéré : tient compte du <strong>nombre de personnes</strong> qui ont classé le prof (un prof noté par beaucoup de monde compte plus qu'un noté par une seule personne) et reste indépendant du nombre de catégories.</p>
+          <div id="statsContent" class="stats-content"></div>
+        </div>
+
+        <!-- Onglet GRAPHIQUES -->
+        <div class="tab-panel" data-panel="graphes">
+          <div id="statsCharts" class="stats-charts">
+            <div class="stats-chart-card">
+              <h3><span class="material-symbols-rounded">bar_chart</span> Nombre de votes par prof</h3>
+              <div class="canvas-wrap"><canvas id="chartVotes"></canvas></div>
+            </div>
+            <div class="stats-chart-card">
+              <h3><span class="material-symbols-rounded">pie_chart</span> Répartition des votes (les plus votés)</h3>
+              <div class="canvas-wrap"><canvas id="chartPie"></canvas></div>
+            </div>
+            <div class="stats-chart-card">
+              <h3><span class="material-symbols-rounded">radar</span> Comparaison du top (toile d'araignée)</h3>
+              <div class="canvas-wrap"><canvas id="chartRadar"></canvas></div>
+            </div>
+            <div class="stats-chart-card">
+              <h3><span class="material-symbols-rounded">scatter_plot</span> Popularité vs note</h3>
+              <div class="canvas-wrap"><canvas id="chartScatter"></canvas></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -233,6 +258,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=10"></script>
+  <script type="module" src="js/app.js?v=11"></script>
 </body>
 </html>

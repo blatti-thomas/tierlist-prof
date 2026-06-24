@@ -16,25 +16,56 @@ import { escapeHtml } from "./util.js?v=6";
 
 // Instances Chart.js en cours, à détruire avant un nouveau rendu
 let charts = [];
+// Dernier classement calculé (réutilisé entre onglets) + état du rendu des graphes
+let currentList = [];
+let chartsRendered = false;
 
 export function initStats() {
   document.getElementById("openStatsBtn").onclick = openStats;
   document.getElementById("closeStatsBtn").onclick = () =>
     document.getElementById("statsModal").classList.remove("open");
+  initTabs();
+}
+
+// ---- Onglets (évitent de devoir scroller : podium / classement / graphiques) ----
+function initTabs() {
+  document.querySelectorAll("#statsTabs .tab").forEach(btn => {
+    btn.addEventListener("click", () => activateTab(btn.dataset.tab));
+  });
+}
+
+function activateTab(name) {
+  document.querySelectorAll("#statsTabs .tab").forEach(b =>
+    b.classList.toggle("tab-active", b.dataset.tab === name));
+  document.querySelectorAll("#statsModal .tab-panel").forEach(p =>
+    p.classList.toggle("tab-panel-active", p.dataset.panel === name));
+
+  // Les graphes ne se dimensionnent correctement qu'une fois le panneau visible :
+  // on les rend à la première ouverture de l'onglet « Graphiques ».
+  if (name === "graphes" && !chartsRendered) {
+    renderCharts(currentList);
+    chartsRendered = true;
+  }
 }
 
 async function openStats() {
   const modal = document.getElementById("statsModal");
   const box = document.getElementById("statsContent");
   modal.classList.add("open");
+  activateTab("podium");
   box.innerHTML = `<p class="hint">Calcul des statistiques…</p>`;
+  document.getElementById("podium").innerHTML = `<p class="hint">Calcul des statistiques…</p>`;
+  document.getElementById("podiumDetail").innerHTML = "";
+  chartsRendered = false;
+  destroyCharts();
   try {
     const boards = await loadAllBoards();
-    const list = computeStats(boards);
-    renderStats(list);
-    renderCharts(list);
+    currentList = computeStats(boards);
+    renderPodium(currentList);
+    renderStats(currentList);
   } catch (e) {
     box.innerHTML = `<p class="login-error">Erreur : ${escapeHtml(e.message)}</p>`;
+    document.getElementById("podium").innerHTML = "";
   }
 }
 
@@ -119,6 +150,66 @@ function renderStats(list) {
 }
 
 // ============================================================
+//  PODIUM (top 3) — cliquable pour voir le détail
+// ============================================================
+
+const MEDAL = ["gold", "silver", "bronze"];
+
+function renderPodium(list) {
+  const box = document.getElementById("podium");
+  const detail = document.getElementById("podiumDetail");
+  box.innerHTML = "";
+  detail.innerHTML = "";
+
+  if (!list.length) {
+    box.innerHTML = `<p class="hint">Aucun prof classé pour l'instant.</p>`;
+    return;
+  }
+
+  const top = list.slice(0, 3);
+  // Ordre d'affichage : 2e à gauche, 1er au centre (plus haut), 3e à droite
+  const order = top.length === 3 ? [1, 0, 2] : top.length === 2 ? [1, 0] : [0];
+
+  order.forEach(idx => {
+    const s = top[idx];
+    const card = document.createElement("button");
+    card.className = `podium-spot podium-${idx + 1}`;
+    card.type = "button";
+    const pct = Math.round(s.score * 100);
+    card.innerHTML =
+      `<span class="material-symbols-rounded podium-medal ${MEDAL[idx]}">${idx === 0 ? "trophy" : "workspace_premium"}</span>` +
+      `<span class="podium-rank">${idx + 1}</span>` +
+      `<span class="podium-name">${escapeHtml(s.name)}</span>` +
+      `<span class="podium-score">${pct}%</span>`;
+    card.onclick = () => showDetail(list, idx);
+    box.appendChild(card);
+  });
+
+  // Détail du 1er affiché par défaut
+  showDetail(list, 0);
+}
+
+function showDetail(list, idx) {
+  const detail = document.getElementById("podiumDetail");
+  const s = list[idx];
+  if (!s) { detail.innerHTML = ""; return; }
+  const pct = Math.round(s.score * 100);
+  const raw = Math.round(s.avg * 100);
+  detail.innerHTML =
+    `<div class="detail-head">` +
+      `<span class="material-symbols-rounded ${idx < 3 ? MEDAL[idx] : ""}">${idx === 0 ? "trophy" : idx < 3 ? "workspace_premium" : "person"}</span>` +
+      `<span class="detail-name">${escapeHtml(s.name)}</span>` +
+      `<span class="detail-pos">#${idx + 1}</span>` +
+    `</div>` +
+    `<div class="stat-bar"><span style="width:${pct}%"></span></div>` +
+    `<div class="detail-grid">` +
+      `<div class="detail-cell"><span class="detail-num">${pct}%</span><span class="detail-lbl">score pondéré</span></div>` +
+      `<div class="detail-cell"><span class="detail-num">${raw}%</span><span class="detail-lbl">score brut</span></div>` +
+      `<div class="detail-cell"><span class="detail-num">${s.count}</span><span class="detail-lbl">classé par ${s.count > 1 ? "personnes" : "personne"}</span></div>` +
+    `</div>`;
+}
+
+// ============================================================
 //  GRAPHES (Chart.js)
 // ============================================================
 
@@ -187,21 +278,18 @@ function renderCharts(list) {
     }
   }));
 
-  // --- 2) Camembert : répartition des votes (top 8 + « Autres ») ---
+  // --- 2) Camembert : répartition des votes (les profs les plus votés) ---
   const TOP = 8;
   const top = byVotes.slice(0, TOP);
-  const restCount = list.slice(TOP).reduce((a, e) => a + e.count, 0);
   const pieLabels = top.map(e => e.name);
   const pieData   = top.map(e => e.count);
-  if (restCount > 0) { pieLabels.push("Autres"); pieData.push(restCount); }
   charts.push(new Chart(document.getElementById("chartPie"), {
     type: "pie",
     data: {
       labels: pieLabels,
       datasets: [{
         data: pieData,
-        backgroundColor: pieLabels.map((_, i) =>
-          i === pieLabels.length - 1 && restCount > 0 ? "#c9c9d4" : PALETTE[i % PALETTE.length]),
+        backgroundColor: pieLabels.map((_, i) => PALETTE[i % PALETTE.length]),
         borderColor: ink,
         borderWidth: 2
       }]

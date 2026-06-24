@@ -167,27 +167,32 @@ body {
 .tier-rows { display: flex; flex-direction: column; gap: 14px; }
 
 .tier-row {
+  /* PC : étiquette à gauche, zone à droite (séparées par un trait) */
   display: flex;
-  flex-direction: column;       /* titre en haut, zone de dépôt en dessous */
+  align-items: stretch;
   border: var(--border);
   border-radius: var(--radius);
   background: #fff;
   box-shadow: var(--shadow);
-  overflow: hidden;
+  overflow: hidden;             /* arrondit la jonction étiquette / bord */
+  min-height: 84px;
 }
 .tier-label {
-  /* En-tête colorée : le nom de la catégorie s'affiche en grand, en haut */
-  width: 100%;
+  /* Largeur automatique : s'ajuste à la longueur du texte (avec garde-fous) */
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 64px;
+  max-width: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(1.2rem, 4.5vw, 2.1rem);
+  font-size: clamp(1rem, 2.4vw, 1.9rem);
   line-height: 1.1;
   font-weight: 700;
   color: #fff;
   text-shadow: 2px 2px 0 rgba(0,0,0,.35);
-  border-bottom: var(--border);
-  padding: 10px 16px;
+  border-right: var(--border);
+  padding: 8px 16px;
   overflow-wrap: anywhere;
   text-align: center;
   user-select: none;
@@ -195,14 +200,12 @@ body {
   -webkit-touch-callout: none;
 }
 .tier-zone {
-  width: 100%;
   flex: 1;
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 10px;
   padding: 12px;
-  min-height: 64px;
   transition: background .12s ease;
 }
 
@@ -676,8 +679,18 @@ body {
 
 @media (max-width: 560px) {
   .brand { font-size: 1.15rem; }
-  /* En-tête de catégorie pleine largeur : le titre reste lisible et en grand */
-  .tier-label { font-size: clamp(1.1rem, 6vw, 1.7rem); padding: 8px 12px; }
+  /* Mobile : le nom de la catégorie passe en en-tête, en grand, au-dessus de
+     la zone de dépôt (séparation par un trait en bas). */
+  .tier-row { flex-direction: column; }
+  .tier-label {
+    width: 100%;
+    max-width: none;
+    border-right: none;
+    border-bottom: var(--border);
+    font-size: clamp(1.1rem, 6vw, 1.7rem);
+    padding: 8px 12px;
+  }
+  .tier-zone { width: 100%; min-height: 60px; }
   .login-card { padding: 26px 20px; }
   .btn { font-size: .92rem; padding: 9px 14px; }
 

@@ -666,7 +666,15 @@ body {
 
 @media (max-width: 560px) {
   .brand { font-size: 1.15rem; }
-  .tier-label { flex-basis: 60px; font-size: 1.3rem; }
+  /* Le libellé s'ajuste à son contenu (un mot court comme « GOAT » reste sur
+     une ligne) ; il ne se coupe qu'au-delà de 32% de la largeur de l'écran. */
+  .tier-label {
+    flex-basis: auto;
+    min-width: 50px;
+    max-width: 32vw;
+    font-size: 1.15rem;
+    padding: 8px 10px;
+  }
   .login-card { padding: 26px 20px; }
   .btn { font-size: .92rem; padding: 9px 14px; }
 

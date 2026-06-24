@@ -4,7 +4,7 @@
 
 import { initStore, onState, getState, setDisplayName } from "./store.js?v=6";
 import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=6";
-import { renderApp } from "./tierlist.js?v=7";
+import { renderApp } from "./tierlist.js?v=8";
 import { initAdmin, renderAdmin } from "./admin.js?v=6";
 import { initGallery } from "./galerie.js?v=6";
 import { initStats } from "./stats.js?v=11";

@@ -117,9 +117,14 @@ function startAutoScroll() {
     if (!drag || !drag.active) { autoScrollRAF = null; return; }
     const { y, x } = lastPointer;
     const h = window.innerHeight;
+    // En haut, le menu jaune (sticky) recouvre le contenu : on déclenche le
+    // défilement dès que le doigt atteint le bord inférieur du menu, pas le
+    // bord de l'écran (sinon on ne peut pas viser les rangs cachés dessous).
+    const topbar = document.querySelector(".topbar");
+    const topEdge = topbar ? topbar.getBoundingClientRect().bottom : 0;
     let dy = 0;
-    if (y < EDGE)            dy = -MAX_SPEED * (1 - y / EDGE);
-    else if (y > h - EDGE)   dy =  MAX_SPEED * (1 - (h - y) / EDGE);
+    if (y < topEdge + EDGE)  dy = -MAX_SPEED * Math.min(1, (topEdge + EDGE - y) / EDGE);
+    else if (y > h - EDGE)   dy =  MAX_SPEED * Math.min(1, (y - (h - EDGE)) / EDGE);
     if (dy !== 0) {
       window.scrollBy(0, dy);
       highlightZone(x, y);   // la zone sous le doigt change pendant le défilement

@@ -1,9 +1,12 @@
 // ============================================================
 //  GALERIE COMMUNE — voir les tier lists de tout le monde
+//  + suivre leurs auteurs (fil d'activité)
 // ============================================================
 
-import { loadAllBoards } from "./store.js?v=14";
-import { escapeHtml } from "./util.js?v=14";
+import { loadAllBoards, getState } from "./store.js?v=14";
+import { escapeHtml, icon } from "./util.js?v=14";
+import { isFollowing, follow, unfollow, loadAllProfiles } from "./profile.js?v=14";
+import { filiereById } from "./catalog.js?v=14";
 
 export function initGallery() {
   document.getElementById("openGalleryBtn").onclick = openGallery;
@@ -17,15 +20,16 @@ async function openGallery() {
   modal.classList.add("open");
   box.innerHTML = `<p class="hint">Chargement des tier lists…</p>`;
   try {
-    const boards = await loadAllBoards();
-    renderGallery(boards);
+    const [boards, profiles] = await Promise.all([loadAllBoards(), loadAllProfiles()]);
+    renderGallery(boards, profiles);
   } catch (e) {
     box.innerHTML = `<p class="login-error">Erreur : ${escapeHtml(e.message)}</p>`;
   }
 }
 
-function renderGallery(boards) {
+function renderGallery(boards, profiles) {
   const box = document.getElementById("galleryContent");
+  const { uid: myUid } = getState();
   box.innerHTML = "";
 
   if (!boards.length) {
@@ -37,13 +41,50 @@ function renderGallery(boards) {
     const ranks = b.ranks || [];
     const profs = b.professors || [];
     const tiers = b.tiers || {};
+    const profile = profiles.get(b.uid);
 
     const card = document.createElement("div");
     card.className = "gallery-card";
 
+    const head = document.createElement("div");
+    head.className = "gallery-head";
+
+    const titleWrap = document.createElement("div");
+    titleWrap.className = "prop-info";
     const title = document.createElement("h3");
     title.textContent = b.displayName || b.uid;
-    card.appendChild(title);
+    titleWrap.appendChild(title);
+    const fil = filiereById(profile?.filiereId)?.name;
+    if (fil) {
+      const sub = document.createElement("span");
+      sub.className = "prop-by";
+      sub.textContent = fil;
+      titleWrap.appendChild(sub);
+    }
+    head.appendChild(titleWrap);
+
+    // Bouton Suivre / Suivi·e (pas sur sa propre carte)
+    if (b.uid !== myUid) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const setLook = () => {
+        const on = isFollowing(b.uid);
+        btn.className = on ? "btn btn-ghost btn-sm" : "btn btn-accent btn-sm";
+        btn.innerHTML = "";
+        btn.append(icon(on ? "person_remove" : "person_add"));
+        btn.append(document.createTextNode(on ? " Suivi·e" : " Suivre"));
+      };
+      setLook();
+      btn.onclick = async () => {
+        try {
+          isFollowing(b.uid) ? await unfollow(b.uid) : await follow(b.uid);
+          setLook();
+        } catch (e) { console.error("Follow :", e); }
+      };
+      head.appendChild(btn);
+    }
+
+    card.appendChild(head);
 
     ranks.forEach(rank => {
       const names = (tiers[rank.id] || [])

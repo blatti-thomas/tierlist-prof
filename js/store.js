@@ -201,6 +201,11 @@ function scheduleSave() {
   saveTimer = setTimeout(() => saveNow().catch(e => console.error("❌ Sauvegarde :", e)), 350);
 }
 
+// Notifié après chaque sauvegarde réussie du board (branché par app.js
+// pour le fil d'activité — un simple hook évite un import circulaire).
+let saveListener = null;
+export function setSaveListener(cb) { saveListener = cb; }
+
 function saveNow() {
   if (!state.board) return Promise.resolve();
   return setDoc(myRef, {
@@ -211,7 +216,7 @@ function saveNow() {
     professors: state.board.professors,
     tiers:      state.board.tiers,
     updatedAt:  serverTimestamp()
-  });
+  }).then(() => { if (saveListener) saveListener(); });
 }
 
 // ============================================================

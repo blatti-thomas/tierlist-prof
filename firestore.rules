@@ -18,6 +18,18 @@ rules_version = '2';
 //                  branches canoniques + correspondances)
 //    - LECTURE / ÉCRITURE : tous les connectés (communauté de
 //      confiance — même modèle collaboratif que les propositions)
+//
+//  comments/{id} : commentaires sur un prof
+//    - CRÉATION : auteur authentifié, texte 2–500 caractères,
+//      ANTI-SPAM : 1 commentaire / 15 s imposé côté serveur — le
+//      batch d'écriture doit mettre à jour users/{uid}.lastCommentAt,
+//      comparé à l'horodatage du commentaire précédent.
+//    - MODIF : l'auteur, OU n'importe qui si SEUL le champ
+//      "reactions" change (réactions emoji des autres).
+//    - SUPPRESSION : l'auteur uniquement.
+//
+//  reactions/{key} : réactions rapides sur un prof { emoji: [uid] }
+//  activity/{id}   : fil d'activité, append-only (pas de modif/suppr.)
 // ============================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -37,6 +49,43 @@ service cloud.firestore {
 
     match /catalog/{docId} {
       allow read, write: if authed();
+    }
+
+    match /comments/{commentId} {
+      allow read: if authed();
+      allow create: if authed()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() >= 2
+        && request.resource.data.text.size() <= 500
+        && request.resource.data.createdAt == request.time
+        // Anti-spam : le batch doit poser users/{uid}.lastCommentAt = maintenant…
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid))
+             .data.lastCommentAt == request.time
+        // …et le commentaire précédent doit dater d'au moins 15 s.
+        && (!exists(/databases/$(database)/documents/users/$(request.auth.uid))
+            || !("lastCommentAt" in get(/databases/$(database)/documents/users/$(request.auth.uid)).data)
+            || request.time > get(/databases/$(database)/documents/users/$(request.auth.uid))
+                                .data.lastCommentAt + duration.value(15, 's'));
+      allow update: if authed() && (
+        resource.data.authorUid == request.auth.uid
+        // Réactions des autres : seul le champ "reactions" peut changer
+        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions'])
+      );
+      allow delete: if authed() && resource.data.authorUid == request.auth.uid;
+    }
+
+    match /reactions/{key} {
+      allow read, write: if authed();
+    }
+
+    match /activity/{id} {
+      allow read: if authed();
+      allow create: if authed()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 200;
+      allow update, delete: if false;
     }
 
     // Tout le reste est verrouillé

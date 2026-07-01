@@ -824,3 +824,120 @@ body {
 .ob-add { margin-bottom: 14px; }
 .ob-add .ipt { font-size: .9rem; }
 #onboardingModal .hint { margin-top: 0; margin-bottom: 12px; }
+
+/* ============================================================
+   SOCIAL — commentaires, réactions, follow, fil (bloc 2)
+   ============================================================ */
+
+.modal-card-md { max-width: 640px; }
+.modal-body-block { display: block; }
+
+/* ---------- Fiche prof ---------- */
+.prof-summary { margin-bottom: 10px; }
+.prof-summary .stat-meta { margin-top: 4px; }
+.prof-comments-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  margin: 16px 0 10px;
+}
+
+/* ---------- Barre de réactions ---------- */
+.react-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.react-btn {
+  font-family: inherit;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  padding: 5px 12px;
+  transition: transform .08s ease;
+}
+.react-btn:hover { transform: translate(-1px, -1px) scale(1.05); }
+.react-btn-on {
+  background: var(--yellow);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.react-bar-sm .react-btn { font-size: .8rem; padding: 3px 9px; border-width: 2px; }
+
+/* ---------- Commentaires ---------- */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+  max-height: 46vh;
+  overflow: auto;
+}
+.comment-item {
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow-sm);
+}
+.comment-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.comment-author { font-weight: 700; font-size: .92rem; }
+.comment-when { font-size: .75rem; opacity: .55; flex: 1; }
+.comment-del { padding: 3px 6px; box-shadow: none; border-width: 2px; }
+.comment-text {
+  font-size: .95rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.comment-form { display: flex; gap: 8px; align-items: flex-end; }
+.comment-form textarea { flex: 1; resize: vertical; min-height: 52px; font-size: .95rem; }
+
+/* ---------- Fil d'activité / personnes ---------- */
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 55vh;
+  overflow: auto;
+}
+.feed-person, .feed-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+.feed-icon { color: var(--primary); flex: 0 0 auto; }
+
+/* ---------- Badge nouveautés sur le bouton Fil ---------- */
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  border: 2px solid var(--ink);
+  font-size: .68rem;
+  font-weight: 700;
+}
+
+/* ---------- Galerie : en-tête avec bouton Suivre ---------- */
+.gallery-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.gallery-head h3 { margin-bottom: 2px; }

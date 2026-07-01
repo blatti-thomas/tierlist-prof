@@ -2,18 +2,20 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState, getState, setDisplayName } from "./store.js?v=14";
+import { initStore, onState, getState, setDisplayName, setSaveListener } from "./store.js?v=14";
 import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=14";
 import { renderApp } from "./tierlist.js?v=14";
 import { initAdmin, renderAdmin } from "./admin.js?v=14";
 import { initGallery } from "./galerie.js?v=14";
-import { initStats } from "./stats.js?v=14";
+import { initStats, setProfClickHandler } from "./stats.js?v=14";
 import { initSuggestions } from "./propositions.js?v=14";
 import { applyTheme } from "./theme.js?v=14";
 import { loadCatalog } from "./catalog.js?v=14";
 import {
   initProfile, getProfile, initOnboarding, openOnboarding, identityLabel
 } from "./profile.js?v=14";
+import { initComments, openProf } from "./comments.js?v=14";
+import { initSocial, logBoardActivity, refreshFeedBadge } from "./social.js?v=14";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
@@ -46,6 +48,7 @@ watchAuth(
         await loadCatalog();
         const profile = await initProfile(user, getState().displayName);
         if (!profile.filiereId) openOnboarding();
+        refreshFeedBadge();
       } catch (e) {
         console.error("Profil / catalogue :", e);
       }
@@ -155,3 +158,10 @@ initAdmin();
 initGallery();
 initStats();
 initSuggestions();
+initComments();
+initSocial();
+
+// Clic sur une ligne des stats → fiche du prof (commentaires, réactions)
+setProfClickHandler(openProf);
+// Sauvegarde du board → événement dans le fil (throttlé à 1 / 10 min)
+setSaveListener(logBoardActivity);

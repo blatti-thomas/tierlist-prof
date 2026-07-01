@@ -50,6 +50,10 @@
         <button id="openPropsBtn" class="btn btn-ghost">
           <span class="material-symbols-rounded">inbox</span> Propositions
         </button>
+        <button id="openFeedBtn" class="btn btn-ghost">
+          <span class="material-symbols-rounded">notifications</span> Fil
+          <span id="feedBadge" class="badge hidden"></span>
+        </button>
         <button id="openAdminBtn" class="btn btn-accent">
           <span class="material-symbols-rounded">tune</span> Ma tier list
         </button>
@@ -306,6 +310,50 @@
               <div class="canvas-wrap"><canvas id="chartScatter"></canvas></div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE FICHE PROF (commentaires + réactions) ============ -->
+  <div id="profModal" class="modal">
+    <div class="modal-card modal-card-md">
+      <div class="modal-head">
+        <h2><span class="material-symbols-rounded">person</span> <span id="profModalName">Prof</span></h2>
+        <button id="closeProfBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
+      </div>
+      <div class="modal-body modal-body-block">
+        <div id="profSummary" class="prof-summary"></div>
+        <div id="profReactions" class="react-bar"></div>
+        <h3 class="prof-comments-title"><span class="material-symbols-rounded">forum</span> Commentaires</h3>
+        <div id="profComments" class="comments-list"></div>
+        <form id="commentForm" class="comment-form">
+          <textarea id="commentText" class="ipt" rows="2" maxlength="500"
+                    placeholder="Ton avis (max 500 caractères — on reste sympa 🙏)"></textarea>
+          <button type="submit" id="commentSendBtn" class="btn btn-primary">
+            <span class="material-symbols-rounded">send</span> Publier
+          </button>
+        </form>
+        <p id="commentMsg" class="hint"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE FIL D'ACTIVITÉ ============ -->
+  <div id="feedModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2><span class="material-symbols-rounded">notifications</span> Fil — l'activité des personnes suivies</h2>
+        <button id="closeFeedBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="admin-col">
+          <h3><span class="material-symbols-rounded">group</span> Qui suivre</h3>
+          <div id="feedPeople" class="feed-list"></div>
+        </div>
+        <div class="admin-col">
+          <h3><span class="material-symbols-rounded">bolt</span> Activité récente</h3>
+          <div id="feedItems" class="feed-list"></div>
         </div>
       </div>
     </div>

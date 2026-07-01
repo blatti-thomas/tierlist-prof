@@ -5,7 +5,7 @@
 //  - Tout le monde peut LIRE tous les boards (galerie commune)
 // ============================================================
 
-import { db } from "./firebase-config.js?v=14";
+import { db } from "./firebase-config.js?v=15";
 import {
   doc, getDoc, setDoc, onSnapshot, collection, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";

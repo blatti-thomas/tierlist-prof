@@ -23,32 +23,73 @@
 //                 inter-filières.
 // ============================================================
 
-import { db } from "./firebase-config.js?v=14";
+import { db } from "./firebase-config.js?v=15";
 import {
   doc, getDoc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { uid } from "./store.js?v=14";
-import { icon } from "./util.js?v=14";
+import { uid } from "./store.js?v=15";
+import { icon } from "./util.js?v=15";
 
 export const norm = (s) => (s || "").trim().toLowerCase();
 
 // ------------------------------------------------------------
-//  ⚠️ DONNÉES DE DÉMARRAGE (DÉMO / PLACEHOLDER)
-//  Les filières et correspondances ci-dessous sont des exemples à
-//  adapter par la communauté (panneau "Ma tier list → Filières &
-//  branches"). Seules les branches reprennent les cours déjà
-//  présents dans le board par défaut du site.
+//  DONNÉES DE DÉMARRAGE
+//  • Filières/orientations : plan d'études Bachelor HEIG-VD fourni
+//    par l'utilisateur (liste officielle) — modifiable via le
+//    panneau "Ma tier list → Filières & branches".
+//  • Branches : reprennent les cours déjà présents dans le board
+//    par défaut du site.
+//  • Correspondances branche↔filière : indicatives, à affiner par
+//    la communauté dans le même panneau.
 // ------------------------------------------------------------
 const SEED_CATALOG = {
   seed: true,
+  seedVersion: 2,
   filieres: [
-    { id: "f_ge",   name: "Génie électrique (GE)", orientations: [
-      { id: "o_ge_ai",  name: "Automatique industrielle (démo)" },
-      { id: "o_ge_ee",  name: "Électronique embarquée (démo)" }
+    { id: "f_apfi", name: "Année Préparatoire Future Ingénieure", orientations: [
+      { id: "o_apfi", name: "Année Préparatoire Future Ingénieure (APFI)" }
     ]},
-    { id: "f_tin",  name: "Filière TIN (démo — à renommer)", orientations: [] },
-    { id: "f_info", name: "Informatique (démo — à adapter)", orientations: [
-      { id: "o_info_log", name: "Logiciel (démo)" }
+    { id: "f_cpre", name: "Semestre préparatoire ingénieur", orientations: [
+      { id: "o_cpre", name: "Semestre préparatoire ingénieur (CPRE)" }
+    ]},
+    { id: "f_ee",   name: "Economie d'entreprise", orientations: [
+      { id: "o_ee", name: "Economie d'entreprise (EE)" }
+    ]},
+    { id: "f_ge",   name: "Génie électrique", orientations: [
+      { id: "o_ge_eai", name: "Electronique et automatisation industrielle (EAI)" },
+      { id: "o_ge_eem", name: "Electronique embarquée et mécatronique (EEM)" },
+      { id: "o_ge_en",  name: "Systèmes énergétiques (EN)" }
+    ]},
+    { id: "f_ete",  name: "Energie et techniques environnementales", orientations: [
+      { id: "o_ete_tc",   name: "Energie et techniques environnementales (ETE) - Tronc commun" },
+      { id: "o_ete_oeba", name: "Option Energétique du bâtiment (OEBA)" },
+      { id: "o_ete_othi", name: "Option Thermique industrielle (OTHI)" }
+    ]},
+    { id: "f_im",   name: "Ingénierie des médias", orientations: [
+      { id: "o_im_gcom", name: "Ingénierie des médias (GCOM)" }
+    ]},
+    { id: "f_gt",   name: "Génie territorial", orientations: [
+      { id: "o_gt_geat", name: "Aménagement du territoire (GEAT)" },
+      { id: "o_gt_geie", name: "Infrastructures et enjeux climatiques (GEIE)" },
+      { id: "o_gt_gemf", name: "Géomatique et maîtrise foncière (GEMF)" },
+      { id: "o_gt_tc",   name: "Génie territorial (GTE) - Tronc commun" }
+    ]},
+    { id: "f_igi",  name: "Ingénierie et gestion industrielles", orientations: [
+      { id: "o_igi_igis", name: "Ingénierie et gestion industrielles (IGIS)" },
+      { id: "o_igi_igqp", name: "Qualité et performances industrielles (IGQP)" }
+    ]},
+    { id: "f_isc",  name: "Informatique et systèmes de communication", orientations: [
+      { id: "o_isc_iscd", name: "Ingénierie des données (ISCD)" },
+      { id: "o_isc_isce", name: "Systèmes informatiques embarqués (ISCE)" },
+      { id: "o_isc_iscl", name: "Informatique logicielle (ISCL)" },
+      { id: "o_isc_iscr", name: "Réseaux et systèmes (ISCR)" },
+      { id: "o_isc_iscs", name: "Sécurité informatique (ISCS)" }
+    ]},
+    { id: "f_mt",   name: "Microtechniques", orientations: [
+      { id: "o_mt_rocm", name: "Robotique et conception microtechnique (ROCM)" }
+    ]},
+    { id: "f_si",   name: "Systèmes industriels", orientations: [
+      { id: "o_si_sicp", name: "Conception de machines (SICP)" }
     ]}
   ],
   subjects: [
@@ -65,23 +106,32 @@ const SEED_CATALOG = {
     { id: "s_gest",   name: "Gestion de projet",         aliases: [] }
   ],
   links: [
-    // Démo : "Mathématiques" est partagée entre GE et TIN → agrégeable.
+    // Branches partagées entre filières → classement agrégeable.
+    // Ex. les maths/la physique se retrouvent dans plusieurs filières
+    // d'ingénierie. Indicatif : à affiner via l'éditeur du catalogue.
     { subjectId: "s_math",   filiereId: "f_ge" },
-    { subjectId: "s_math",   filiereId: "f_tin" },
+    { subjectId: "s_math",   filiereId: "f_isc" },
+    { subjectId: "s_math",   filiereId: "f_mt" },
+    { subjectId: "s_math",   filiereId: "f_si" },
     { subjectId: "s_phys",   filiereId: "f_ge" },
-    { subjectId: "s_phys",   filiereId: "f_tin" },
+    { subjectId: "s_phys",   filiereId: "f_mt" },
+    { subjectId: "s_phys",   filiereId: "f_si" },
     { subjectId: "s_syslog", filiereId: "f_ge" },
+    { subjectId: "s_syslog", filiereId: "f_isc" },
     { subjectId: "s_electro",filiereId: "f_ge" },
     { subjectId: "s_prog",   filiereId: "f_ge" },
-    { subjectId: "s_prog",   filiereId: "f_info" },
+    { subjectId: "s_prog",   filiereId: "f_isc" },
+    { subjectId: "s_prog",   filiereId: "f_mt" },
     { subjectId: "s_mes",    filiereId: "f_ge" },
     { subjectId: "s_regul",  filiereId: "f_ge" },
     { subjectId: "s_puiss",  filiereId: "f_ge" },
     { subjectId: "s_meca",   filiereId: "f_ge" },
+    { subjectId: "s_meca",   filiereId: "f_mt" },
     { subjectId: "s_sign",   filiereId: "f_ge" },
+    { subjectId: "s_sign",   filiereId: "f_isc" },
     { subjectId: "s_gest",   filiereId: "f_ge" },
-    { subjectId: "s_gest",   filiereId: "f_tin" },
-    { subjectId: "s_gest",   filiereId: "f_info" }
+    { subjectId: "s_gest",   filiereId: "f_igi" },
+    { subjectId: "s_gest",   filiereId: "f_isc" }
   ]
 };
 
@@ -103,8 +153,22 @@ export async function loadCatalog(force = false) {
       subjects: d.subjects || [],
       links:    d.links    || []
     };
+    // Migration v2 : remplace les anciennes filières "(démo)" par le
+    // plan d'études HEIG-VD officiel. Les branches ajoutées par les
+    // utilisateurs sont conservées ; les correspondances repartent du
+    // seed (les anciennes pointaient sur des filières supprimées).
+    if ((d.seedVersion || 1) < 2 && catalog.filieres.some(f => /démo|demo/i.test(f.name || ""))) {
+      const customSubjects = catalog.subjects.filter(s =>
+        !SEED_CATALOG.subjects.some(x => x.id === s.id));
+      catalog = {
+        filieres: structuredClone(SEED_CATALOG.filieres),
+        subjects: [...structuredClone(SEED_CATALOG.subjects), ...customSubjects],
+        links:    structuredClone(SEED_CATALOG.links)
+      };
+      await setDoc(catRef(), { ...catalog, seedVersion: 2, updatedAt: serverTimestamp() });
+    }
   } else {
-    // Premier utilisateur : on initialise avec les données de démo.
+    // Premier utilisateur : on initialise avec les données de départ.
     catalog = structuredClone(SEED_CATALOG);
     await setDoc(catRef(), { ...catalog, updatedAt: serverTimestamp() });
   }

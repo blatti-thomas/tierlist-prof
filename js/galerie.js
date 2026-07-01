@@ -3,10 +3,10 @@
 //  + suivre leurs auteurs (fil d'activité)
 // ============================================================
 
-import { loadAllBoards, getState } from "./store.js?v=14";
-import { escapeHtml, icon } from "./util.js?v=14";
-import { isFollowing, follow, unfollow, loadAllProfiles } from "./profile.js?v=14";
-import { filiereById } from "./catalog.js?v=14";
+import { loadAllBoards, getState } from "./store.js?v=15";
+import { escapeHtml, icon } from "./util.js?v=15";
+import { isFollowing, follow, unfollow, loadAllProfiles } from "./profile.js?v=15";
+import { filiereById } from "./catalog.js?v=15";
 
 export function initGallery() {
   document.getElementById("openGalleryBtn").onclick = openGallery;
@@ -20,7 +20,12 @@ async function openGallery() {
   modal.classList.add("open");
   box.innerHTML = `<p class="hint">Chargement des tier lists…</p>`;
   try {
-    const [boards, profiles] = await Promise.all([loadAllBoards(), loadAllProfiles()]);
+    // Les profils peuvent être refusés tant que les nouvelles règles
+    // Firestore ne sont pas publiées : la galerie s'affiche quand même.
+    const [boards, profiles] = await Promise.all([
+      loadAllBoards(),
+      loadAllProfiles().catch(() => new Map())
+    ]);
     renderGallery(boards, profiles);
   } catch (e) {
     box.innerHTML = `<p class="login-error">Erreur : ${escapeHtml(e.message)}</p>`;
@@ -99,6 +104,7 @@ function renderGallery(boards, profiles) {
       lab.className = "ranking-label";
       lab.style.background = rank.color;
       lab.textContent = rank.label;
+      lab.title = rank.label;   // nom complet au survol (libellé tronqué si long)
 
       const list = document.createElement("span");
       list.className = "ranking-names";

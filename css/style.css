@@ -105,6 +105,25 @@ body {
   outline: none;
 }
 .ipt:focus { box-shadow: var(--shadow-sm); }
+
+/* Menus déroulants : même style "cartoon" que le reste du site
+   (chevron custom, l'apparence native est désactivée) */
+select.ipt {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-weight: 600;
+  cursor: pointer;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2315151e' d='M12 15.4 5.8 9.2l1.4-1.4 4.8 4.8 4.8-4.8 1.4 1.4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 18px;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+select.ipt:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow-sm); }
+select.ipt:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+select.ipt option { font-weight: 500; background: #fff; color: var(--text); }
 .ipt-lg { font-size: 1.15rem; padding: 14px 16px; text-align: center; }
 .ipt-color {
   width: 46px; height: 40px; padding: 2px;
@@ -643,18 +662,23 @@ body {
   margin-bottom: 6px;
 }
 .ranking-label {
-  flex: 0 0 38px;
-  display: grid;
-  place-items: center;
+  /* Une seule ligne : largeur auto bornée + points de suspension
+     (le nom complet reste lisible au survol via title). */
+  flex: 0 0 auto;
+  align-self: center;
+  min-width: 38px;
+  max-width: 45%;
   border: 2.5px solid var(--ink);
   border-radius: 8px;
   color: #fff;
   font-weight: 700;
   text-shadow: 1px 1px 0 rgba(0,0,0,.35);
-  padding: 2px;
+  padding: 4px 8px;
   font-size: .85rem;
   text-align: center;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .ranking-names {
   flex: 1;
@@ -999,3 +1023,94 @@ body {
 
 /* ---------- Leaderboard : ma ligne mise en avant ---------- */
 .score-me { background: #fff3b0; }
+
+/* ============================================================
+   MOBILE — PASSE DE LISIBILITÉ GLOBALE
+   (surcharge les règles précédentes : chargé en dernier)
+   ============================================================ */
+@media (max-width: 560px) {
+
+  /* ---------- Topbar : grille compacte de 3 colonnes ---------- */
+  .topbar { padding: 10px 10px; gap: 8px; }
+  .topbar-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+  .topbar-actions .btn {
+    font-size: .76rem;
+    padding: 9px 4px;
+    gap: 4px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 0 var(--ink);
+    min-width: 0;
+  }
+  .topbar-actions .btn .material-symbols-rounded { font-size: 1.15em; }
+  #profileName {
+    max-width: 64px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ---------- Modales : quasi plein écran, en-têtes compacts ---------- */
+  .modal { padding: 6px; }
+  .modal-card { margin: 4px 0; border-radius: 16px; }
+  .modal-head { padding: 11px 12px; gap: 8px; }
+  .modal-head h2 { font-size: 1rem; line-height: 1.2; }
+  .modal-body { padding: 12px; gap: 12px; }
+
+  /* ---------- Champs et menus déroulants plus digestes ---------- */
+  .ipt { font-size: .92rem; padding: 9px 10px; }
+  select.ipt { padding-right: 32px; background-size: 16px; }
+
+  /* ---------- Stats : filtres empilés pleine largeur ---------- */
+  .stats-filters { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; }
+  .stats-filters label { flex: 1 1 auto; }
+  .stats-filters .flt-check { padding-bottom: 0; white-space: normal; }
+  .stat-row { padding: 8px 10px; gap: 8px; }
+  .stat-pos { flex: 0 0 28px; font-size: 1rem; }
+  .stat-pos .material-symbols-rounded { font-size: 1.4rem; }
+  .stat-name { font-size: .92rem; }
+  .stat-meta { font-size: .72rem; }
+
+  /* ---------- Fiche prof : formulaire empilé, liste bornée ---------- */
+  .comment-form { flex-direction: column; align-items: stretch; }
+  .comment-form .btn { width: 100%; }
+  .comments-list { max-height: 38vh; }
+  .comment-text { font-size: .9rem; }
+
+  /* ---------- Galerie : étiquettes de rang bornées ---------- */
+  .ranking-label { max-width: 40%; font-size: .78rem; padding: 3px 6px; }
+  .ranking-names { font-size: .8rem; }
+  .gallery-head .btn { font-size: .78rem; padding: 6px 8px; }
+
+  /* ---------- Fil ---------- */
+  .feed-list { max-height: 40vh; }
+  .feed-person .btn { font-size: .78rem; padding: 6px 8px; white-space: nowrap; }
+
+  /* ---------- Jeux : question lisible, réponses en 2 colonnes ---------- */
+  .quiz-question { font-size: 1.05rem; }
+  .quiz-options { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .quiz-option { padding: 12px 8px; font-size: .9rem; }
+  .quiz-feedback { font-size: .88rem; }
+  .game-card { flex-wrap: wrap; padding: 12px; }
+  .game-card > .btn { width: 100%; }
+  .quiz-end-score { font-size: 1.6rem; }
+
+  /* ---------- Catalogue / admin ---------- */
+  .cat-chip { font-size: .66rem; padding: 3px 8px; }
+  .cat-subtitle { font-size: .92rem; }
+
+  /* ---------- Divers ---------- */
+  .hint { font-size: .82rem; }
+  .react-btn { font-size: .88rem; padding: 4px 10px; }
+  .badge { min-width: 18px; height: 18px; font-size: .62rem; }
+}
+
+/* Très petits écrans : la topbar passe à 2 colonnes */
+@media (max-width: 360px) {
+  .topbar-actions { grid-template-columns: repeat(2, 1fr); }
+  .quiz-options { grid-template-columns: 1fr; }
+}

@@ -21,12 +21,12 @@
 //   • nuage 2D — popularité (votes) vs note (score)
 // ============================================================
 
-import { loadAllBoards } from "./store.js?v=14";
-import { escapeHtml } from "./util.js?v=14";
+import { loadAllBoards } from "./store.js?v=15";
+import { escapeHtml } from "./util.js?v=15";
 import {
   loadCatalog, getCatalog, norm, subjectForBranchName, isSubjectInFiliere, subjectsOfFiliere
-} from "./catalog.js?v=14";
-import { getProfile, loadAllProfiles } from "./profile.js?v=14";
+} from "./catalog.js?v=15";
+import { getProfile, loadAllProfiles } from "./profile.js?v=15";
 
 // Instances Chart.js en cours, à détruire avant un nouveau rendu
 let charts = [];
@@ -89,7 +89,7 @@ function initFilters() {
 
 function populateFiliereFilter() {
   const selF = document.getElementById("fltFiliere");
-  const cat = getCatalog();
+  const cat = getCatalog() || { filieres: [], subjects: [], links: [] };
   selF.innerHTML = `<option value="">Toutes les filières</option>` +
     cat.filieres.map(f =>
       `<option value="${f.id}" ${f.id === filters.filiereId ? "selected" : ""}>${escapeHtml(f.name)}</option>`
@@ -98,7 +98,7 @@ function populateFiliereFilter() {
 
 function populateSubjectFilter() {
   const selS = document.getElementById("fltSubject");
-  const cat = getCatalog();
+  const cat = getCatalog() || { filieres: [], subjects: [], links: [] };
   const subjects = filters.filiereId ? subjectsOfFiliere(filters.filiereId) : cat.subjects;
 
   // Hors filtre filière, on propose aussi les cours non rattachés au
@@ -132,7 +132,13 @@ async function openStats() {
   chartsRendered = false;
   destroyCharts();
   try {
-    [rawBoards, profiles] = await Promise.all([loadAllBoards(), loadAllProfiles(), loadCatalog()]);
+    // Profils et catalogue peuvent être refusés tant que les nouvelles
+    // règles Firestore ne sont pas publiées : on dégrade sans casser.
+    [rawBoards, profiles] = await Promise.all([
+      loadAllBoards(),
+      loadAllProfiles().catch(() => new Map()),
+      loadCatalog().catch(e => { console.warn("Catalogue indisponible :", e.code || e.message); return null; })
+    ]);
     // Pré-sélectionne la filière de l'utilisateur (modifiable)
     filters = { filiereId: getProfile()?.filiereId || "", subjectId: "", aggregate: true };
     document.getElementById("fltAggregate").checked = true;

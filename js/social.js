@@ -19,8 +19,7 @@ import {
 import { getState } from "./store.js?v=14";
 import { getProfile, isFollowing, follow, unfollow, loadAllProfiles } from "./profile.js?v=14";
 import { filiereById } from "./catalog.js?v=14";
-import { escapeHtml, icon } from "./util.js?v=14";
-import { relativeTime } from "./comments.js?v=14";
+import { escapeHtml, icon, relativeTime } from "./util.js?v=14";
 
 const TYPE_ICON = { comment: "chat_bubble", board: "format_list_numbered", game: "sports_esports" };
 

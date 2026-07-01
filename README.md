@@ -35,6 +35,16 @@ Bref : **c'est pour rire, on reste respectueux.** 🙏
 - 📊 Statistiques : les profs les mieux classés (score normalisé, indépendant du nombre de catégories)
 - 📥 Propositions : importer les profs/cours/catégories ajoutés par les autres, sans doublons
 - 👤 Pseudo modifiable à tout moment
+- 🎓 Filière & orientation : choisies à la première connexion (persistées dans le compte),
+  les stats sont filtrées pour ton cursus
+- 🔗 Branches canoniques : un même cours enseigné dans plusieurs filières (ex. « Mathématiques »)
+  est **agrégeable** entre elles via un catalogue partagé (table de correspondance branche ↔ filière)
+- 💬 Commentaires & réactions emoji sur chaque prof (fiche accessible depuis les stats),
+  avec anti-spam côté serveur (1 commentaire / 15 s, imposé par les règles Firestore)
+- 👥 Follow : suis d'autres utilisateurs et retrouve leur activité (tier lists, avis, parties)
+  dans le fil, avec badge de nouveautés
+- 🎮 Mini-jeux (« Qui enseigne ce cours ? », « Le verdict de la commu ») avec leaderboard dédié,
+  distinct du classement des profs
 
 ---
 
@@ -76,12 +86,33 @@ js/
   tierlist.js           rendu + glisser-déposer
   admin.js              éditeur de son board
   theme.js              personnalisation de l'apparence
-  galerie.js            galerie commune
-  stats.js              statistiques
+  galerie.js            galerie commune + boutons "Suivre"
+  stats.js              statistiques (filtres filière/branche + agrégation)
   propositions.js       import des ajouts des autres
+  catalog.js            catalogue partagé : filières, branches canoniques, correspondances
+  profile.js            profil users/{uid} : filière, orientation, follows + onboarding
+  comments.js           fiche prof : commentaires + réactions emoji
+  social.js             follow, fil d'activité, badge de nouveautés
+  games.js              mini-jeux + leaderboard
   app.js                point d'entrée
 firestore.rules         règles de sécurité Firestore
 ```
+
+### 🗃️ Collections Firestore
+
+| Collection        | Contenu                                                        | Lecture   | Écriture |
+|-------------------|----------------------------------------------------------------|-----------|----------|
+| `boards/{uid}`    | tier list complète d'un utilisateur                            | connectés | propriétaire |
+| `users/{uid}`     | profil léger : pseudo, filière, orientation, follows           | connectés | propriétaire |
+| `catalog/main`    | filières/orientations + branches canoniques + correspondances  | connectés | connectés (communautaire) |
+| `comments/{id}`   | commentaires sur un prof (+ réactions)                         | connectés | auteur (réactions : tous) |
+| `reactions/{key}` | réactions rapides sur un prof                                  | connectés | connectés |
+| `activity/{id}`   | fil d'activité (append-only)                                   | connectés | auteur, sans modif/suppr. |
+| `scores/{uid}`    | leaderboard des mini-jeux                                      | connectés | propriétaire |
+
+> ⚠️ **Après mise à jour du code, republie les règles** ([`firestore.rules`](firestore.rules)) dans
+> la console Firebase, sinon les nouvelles fonctionnalités (filières, commentaires, fil, scores)
+> répondent `permission-denied`. La tier list de base continue de fonctionner en attendant.
 
 ---
 

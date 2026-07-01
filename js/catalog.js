@@ -28,7 +28,7 @@ import {
   doc, getDoc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { uid } from "./store.js?v=14";
-import { escapeHtml, icon } from "./util.js?v=14";
+import { icon } from "./util.js?v=14";
 
 export const norm = (s) => (s || "").trim().toLowerCase();
 

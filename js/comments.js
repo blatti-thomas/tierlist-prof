@@ -21,7 +21,7 @@ import {
   writeBatch, serverTimestamp, arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getState, uid as newId } from "./store.js?v=14";
-import { escapeHtml, icon } from "./util.js?v=14";
+import { escapeHtml, icon, relativeTime } from "./util.js?v=14";
 import { norm } from "./catalog.js?v=14";
 import { logActivity } from "./social.js?v=14";
 
@@ -233,13 +233,3 @@ async function postComment() {
   }
 }
 
-function relativeTime(ts) {
-  if (!ts?.seconds) return "";
-  const s = Math.max(0, Math.floor(Date.now() / 1000 - ts.seconds));
-  if (s < 60)     return "à l'instant";
-  if (s < 3600)   return `il y a ${Math.floor(s / 60)} min`;
-  if (s < 86400)  return `il y a ${Math.floor(s / 3600)} h`;
-  return `il y a ${Math.floor(s / 86400)} j`;
-}
-
-export { relativeTime };

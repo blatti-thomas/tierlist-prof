@@ -19,3 +19,13 @@ export function icon(name) {
   s.textContent = name;
   return s;
 }
+
+// "il y a X min" à partir d'un Timestamp Firestore
+export function relativeTime(ts) {
+  if (!ts?.seconds) return "";
+  const s = Math.max(0, Math.floor(Date.now() / 1000 - ts.seconds));
+  if (s < 60)     return "à l'instant";
+  if (s < 3600)   return `il y a ${Math.floor(s / 60)} min`;
+  if (s < 86400)  return `il y a ${Math.floor(s / 3600)} h`;
+  return `il y a ${Math.floor(s / 86400)} j`;
+}

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,0,0" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=13">
+  <link rel="stylesheet" href="css/style.css?v=14">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
@@ -116,6 +116,33 @@
         </div>
 
         <div class="admin-col admin-col-wide collapsed">
+          <h3 class="acc-head"><span class="acc-title"><span class="material-symbols-rounded">school</span> Filières &amp; branches (catalogue partagé)</span><span class="material-symbols-rounded acc-chevron">expand_more</span></h3>
+          <div class="acc-body">
+            <p class="hint">Catalogue commun à tout le monde : filières/orientations et branches canoniques.
+               Une branche associée à plusieurs filières (boutons ci-dessous) est <strong>agrégeable</strong> entre elles dans les stats.
+               La liste de départ est une <strong>démo à adapter</strong>.</p>
+            <div class="cat-grid">
+              <div>
+                <h4 class="cat-subtitle"><span class="material-symbols-rounded">school</span> Filières &amp; orientations</h4>
+                <div id="adminFilieres" class="admin-list"></div>
+                <div class="admin-add">
+                  <input id="newFiliereName" class="ipt" placeholder="Nouvelle filière">
+                  <button id="addFiliereBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
+                </div>
+              </div>
+              <div>
+                <h4 class="cat-subtitle"><span class="material-symbols-rounded">hub</span> Branches canoniques &amp; correspondances</h4>
+                <div id="adminSubjects" class="admin-list"></div>
+                <div class="admin-add">
+                  <input id="newSubjectName" class="ipt" placeholder="Nouvelle branche (ex. Analyse)">
+                  <button id="addSubjectBtn" class="btn btn-primary btn-sm"><span class="material-symbols-rounded">add</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-col admin-col-wide collapsed">
           <h3 class="acc-head"><span class="acc-title"><span class="material-symbols-rounded">palette</span> Apparence</span><span class="material-symbols-rounded acc-chevron">expand_more</span></h3>
           <div class="acc-body">
           <div class="theme-grid">
@@ -162,10 +189,47 @@
         <label class="profile-field">Ton pseudo
           <input id="profilePseudo" class="ipt" placeholder="Ton pseudo" maxlength="40">
         </label>
+        <div class="profile-field">Ta filière
+          <div class="profile-filiere">
+            <span id="profileFiliere" class="profile-filiere-label">…</span>
+            <button id="changeFiliereBtn" class="btn btn-ghost btn-sm" type="button">
+              <span class="material-symbols-rounded">edit</span> Changer
+            </button>
+          </div>
+        </div>
         <button id="saveProfileBtn" class="btn btn-primary btn-block">
           <span class="material-symbols-rounded">save</span> Enregistrer
         </button>
         <p id="profileMsg" class="hint"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE ONBOARDING (filière / orientation) ============ -->
+  <div id="onboardingModal" class="modal">
+    <div class="modal-card modal-card-sm">
+      <div class="modal-head">
+        <h2><span class="material-symbols-rounded">school</span> Ma filière</h2>
+        <button id="closeOnboardingBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
+      </div>
+      <div class="modal-body modal-body-sm">
+        <p class="hint">Choisis ta filière et ton orientation : les classements seront filtrés
+           pour ton cursus (modifiable à tout moment depuis ton profil).
+           La liste de départ est une démo — ajoute la tienne si elle manque.</p>
+        <label class="profile-field">Filière
+          <select id="obFiliere" class="ipt"></select>
+        </label>
+        <label class="profile-field">Orientation
+          <select id="obOrientation" class="ipt"></select>
+        </label>
+        <div class="admin-add ob-add">
+          <input id="obNewFiliere" class="ipt" placeholder="Ma filière manque ? Ajoute-la ici">
+          <button id="obAddFiliereBtn" class="btn btn-accent btn-sm"><span class="material-symbols-rounded">add</span></button>
+        </div>
+        <button id="obSaveBtn" class="btn btn-primary btn-block">
+          <span class="material-symbols-rounded">save</span> Enregistrer
+        </button>
+        <p id="obMsg" class="hint"></p>
       </div>
     </div>
   </div>
@@ -191,6 +255,19 @@
         <button id="closeStatsBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
       </div>
       <div class="modal-body">
+        <!-- Filtres : filière / branche (catalogue partagé) + agrégation -->
+        <div id="statsFilters" class="stats-filters">
+          <label><span class="cap">Filière</span>
+            <select id="fltFiliere" class="ipt"></select>
+          </label>
+          <label><span class="cap">Branche</span>
+            <select id="fltSubject" class="ipt"></select>
+          </label>
+          <label class="flt-check" title="Coché : les votes de toutes les filières comptent (branches partagées). Décoché : seulement ceux de la filière choisie.">
+            <input type="checkbox" id="fltAggregate" checked> Agréger toutes les filières
+          </label>
+        </div>
+
         <nav id="statsTabs" class="tabs">
           <button class="tab tab-active" data-tab="podium"><span class="material-symbols-rounded">emoji_events</span> Podium</button>
           <button class="tab" data-tab="classement"><span class="material-symbols-rounded">format_list_numbered</span> Classement</button>
@@ -258,6 +335,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=13"></script>
+  <script type="module" src="js/app.js?v=14"></script>
 </body>
 </html>

@@ -4,6 +4,16 @@
 //  Pour un board à N rangs, le rang i (0 = tout en haut) vaut
 //  (N-1-i)/(N-1) → haut = 1, bas = 0. Moyenne sur tous les boards.
 //
+//  FILTRES PAR FILIÈRE / BRANCHE :
+//  • Chaque prof est rattaché à sa BRANCHE CANONIQUE (catalogue
+//    partagé) via le nom de cours majoritaire sur les boards.
+//  • Filtre "filière" : ne garde que les profs dont la branche est
+//    reliée à la filière (table de correspondance du catalogue).
+//  • Mode "agrégé" (par défaut) : les votes de TOUTES les filières
+//    comptent (utile pour les branches partagées, ex. Mathématiques).
+//    Décoché : seuls les votes des étudiants de la filière choisie
+//    comptent (nécessite que les votants aient renseigné leur filière).
+//
 //  En plus du classement, on dessine des graphes (Chart.js) :
 //   • barres   — nombre de votes par prof
 //   • camembert — répartition des votes
@@ -11,20 +21,33 @@
 //   • nuage 2D — popularité (votes) vs note (score)
 // ============================================================
 
-import { loadAllBoards } from "./store.js?v=6";
-import { escapeHtml } from "./util.js?v=6";
+import { loadAllBoards } from "./store.js?v=14";
+import { escapeHtml } from "./util.js?v=14";
+import {
+  loadCatalog, getCatalog, norm, subjectForBranchName, isSubjectInFiliere, subjectsOfFiliere
+} from "./catalog.js?v=14";
+import { getProfile, loadAllProfiles } from "./profile.js?v=14";
 
 // Instances Chart.js en cours, à détruire avant un nouveau rendu
 let charts = [];
-// Dernier classement calculé (réutilisé entre onglets) + état du rendu des graphes
+// Données brutes chargées à l'ouverture, filtres et classement courant
+let rawBoards = [];
+let profiles = new Map();          // uid -> profil (filiereId…)
+let filters = { filiereId: "", subjectId: "", aggregate: true };
 let currentList = [];
 let chartsRendered = false;
+
+// Ouvre la fiche d'un prof au clic sur une ligne (branché par comments.js,
+// évite un import circulaire stats ↔ commentaires)
+let onProfClick = null;
+export function setProfClickHandler(cb) { onProfClick = cb; }
 
 export function initStats() {
   document.getElementById("openStatsBtn").onclick = openStats;
   document.getElementById("closeStatsBtn").onclick = () =>
     document.getElementById("statsModal").classList.remove("open");
   initTabs();
+  initFilters();
 }
 
 // ---- Onglets (évitent de devoir scroller : podium / classement / graphiques) ----
@@ -48,6 +71,56 @@ function activateTab(name) {
   }
 }
 
+// ---- Barre de filtres (filière / branche / agrégation) ----
+function initFilters() {
+  const selF = document.getElementById("fltFiliere");
+  const selS = document.getElementById("fltSubject");
+  const agg  = document.getElementById("fltAggregate");
+
+  selF.onchange = () => {
+    filters.filiereId = selF.value;
+    filters.subjectId = "";            // la liste des branches change
+    populateSubjectFilter();
+    refresh();
+  };
+  selS.onchange = () => { filters.subjectId = selS.value; refresh(); };
+  agg.onchange  = () => { filters.aggregate = agg.checked; refresh(); };
+}
+
+function populateFiliereFilter() {
+  const selF = document.getElementById("fltFiliere");
+  const cat = getCatalog();
+  selF.innerHTML = `<option value="">Toutes les filières</option>` +
+    cat.filieres.map(f =>
+      `<option value="${f.id}" ${f.id === filters.filiereId ? "selected" : ""}>${escapeHtml(f.name)}</option>`
+    ).join("");
+}
+
+function populateSubjectFilter() {
+  const selS = document.getElementById("fltSubject");
+  const cat = getCatalog();
+  const subjects = filters.filiereId ? subjectsOfFiliere(filters.filiereId) : cat.subjects;
+
+  // Hors filtre filière, on propose aussi les cours non rattachés au
+  // catalogue (pseudo-branches "raw:") pour ne rien cacher.
+  const extra = [];
+  if (!filters.filiereId) {
+    const seen = new Set();
+    attachSubjects(computeStats(rawBoards)).forEach(e => {
+      if (e.subjectId && e.subjectId.startsWith("raw:") && !seen.has(e.subjectId)) {
+        seen.add(e.subjectId);
+        extra.push({ id: e.subjectId, name: e.branchLabel + " (hors catalogue)" });
+      }
+    });
+    extra.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  selS.innerHTML = `<option value="">Toutes les branches</option>` +
+    [...subjects, ...extra].map(s =>
+      `<option value="${s.id}" ${s.id === filters.subjectId ? "selected" : ""}>${escapeHtml(s.name)}</option>`
+    ).join("");
+}
+
 async function openStats() {
   const modal = document.getElementById("statsModal");
   const box = document.getElementById("statsContent");
@@ -59,22 +132,56 @@ async function openStats() {
   chartsRendered = false;
   destroyCharts();
   try {
-    const boards = await loadAllBoards();
-    currentList = computeStats(boards);
-    renderPodium(currentList);
-    renderStats(currentList);
+    [rawBoards, profiles] = await Promise.all([loadAllBoards(), loadAllProfiles(), loadCatalog()]);
+    // Pré-sélectionne la filière de l'utilisateur (modifiable)
+    filters = { filiereId: getProfile()?.filiereId || "", subjectId: "", aggregate: true };
+    document.getElementById("fltAggregate").checked = true;
+    populateFiliereFilter();
+    populateSubjectFilter();
+    refresh();
   } catch (e) {
     box.innerHTML = `<p class="login-error">Erreur : ${escapeHtml(e.message)}</p>`;
     document.getElementById("podium").innerHTML = "";
   }
 }
 
-function computeStats(boards) {
-  const agg = new Map(); // nom -> { sum, count }
+// Recalcule le classement selon les filtres puis re-rend les panneaux
+function refresh() {
+  let boards = rawBoards;
+  if (!filters.aggregate && filters.filiereId) {
+    boards = boards.filter(b => profiles.get(b.uid)?.filiereId === filters.filiereId);
+  }
+
+  let list = attachSubjects(computeStats(boards));
+  if (filters.subjectId) {
+    list = list.filter(e => e.subjectId === filters.subjectId);
+  } else if (filters.filiereId) {
+    list = list.filter(e => e.subjectId && !e.subjectId.startsWith("raw:")
+                            && isSubjectInFiliere(e.subjectId, filters.filiereId));
+  }
+
+  currentList = list;
+  renderPodium(list);
+  renderStats(list);
+  if (document.querySelector("#statsTabs .tab-active")?.dataset.tab === "graphes") {
+    renderCharts(list);
+    chartsRendered = true;
+  } else {
+    destroyCharts();
+    chartsRendered = false;
+  }
+}
+
+// ============================================================
+//  AGRÉGATION (exportée : réutilisée par les mini-jeux)
+// ============================================================
+export function computeStats(boards) {
+  const agg = new Map(); // nom -> { sum, count, branchCounts }
 
   boards.forEach(b => {
     const ranks = b.ranks || [];
     const profs = b.professors || [];
+    const branches = b.branches || [];
     const tiers = b.tiers || {};
     const n = ranks.length;
 
@@ -84,16 +191,25 @@ function computeStats(boards) {
         const p = profs.find(x => x.id === pid);
         if (!p || !p.name) return;
         const key = p.name.trim();
-        const cur = agg.get(key) || { sum: 0, count: 0 };
+        const cur = agg.get(key) || { sum: 0, count: 0, branchCounts: new Map() };
         cur.sum += score;
         cur.count += 1;
+        // Compte le nom du cours associé sur ce board (pour rattacher
+        // le prof à sa branche canonique via le nom majoritaire).
+        const br = branches.find(x => x.id === p.branchId);
+        if (br && br.name) {
+          const bk = norm(br.name);
+          const e = cur.branchCounts.get(bk) || { label: br.name.trim(), count: 0 };
+          e.count += 1;
+          cur.branchCounts.set(bk, e);
+        }
         agg.set(key, cur);
       });
     });
   });
 
   const entries = [...agg.entries()]
-    .map(([name, v]) => ({ name, sum: v.sum, avg: v.sum / v.count, count: v.count }));
+    .map(([name, v]) => ({ name, sum: v.sum, avg: v.sum / v.count, count: v.count, branchCounts: v.branchCounts }));
   if (!entries.length) return [];
 
   // --- Moyenne pondérée bayésienne (corrige le biais du petit échantillon) ---
@@ -112,12 +228,28 @@ function computeStats(boards) {
   return entries.sort((a, b) => b.score - a.score || b.count - a.count);
 }
 
+// Rattache chaque prof à sa branche canonique (nom de cours majoritaire).
+// Sans correspondance dans le catalogue → pseudo-branche "raw:<nom>".
+function attachSubjects(list) {
+  list.forEach(e => {
+    let best = null;
+    (e.branchCounts || new Map()).forEach(v => {
+      if (!best || v.count > best.count) best = v;
+    });
+    if (!best) { e.subjectId = null; e.branchLabel = ""; return; }
+    const subject = subjectForBranchName(best.label);
+    if (subject) { e.subjectId = subject.id; e.branchLabel = subject.name; }
+    else { e.subjectId = "raw:" + norm(best.label); e.branchLabel = best.label; }
+  });
+  return list;
+}
+
 function renderStats(list) {
   const box = document.getElementById("statsContent");
   box.innerHTML = "";
 
   if (!list.length) {
-    box.innerHTML = `<p class="hint">Aucun prof classé pour l'instant.</p>`;
+    box.innerHTML = `<p class="hint">Aucun prof classé pour ces filtres.</p>`;
     return;
   }
 
@@ -139,12 +271,19 @@ function renderStats(list) {
     main.className = "stat-main";
     const pct = Math.round(s.score * 100);
     const raw = Math.round(s.avg * 100);
+    const branch = s.branchLabel ? ` · ${escapeHtml(s.branchLabel)}` : "";
     main.innerHTML =
       `<div class="stat-name">${escapeHtml(s.name)}</div>` +
       `<div class="stat-bar"><span style="width:${pct}%"></span></div>` +
-      `<div class="stat-meta">${pct}% pondéré · ${raw}% brut · classé par ${s.count} personne${s.count > 1 ? "s" : ""}</div>`;
+      `<div class="stat-meta">${pct}% pondéré · ${raw}% brut · classé par ${s.count} personne${s.count > 1 ? "s" : ""}${branch}</div>`;
 
     row.append(pos, main);
+
+    if (onProfClick) {
+      row.classList.add("stat-clickable");
+      row.onclick = () => onProfClick(s);
+    }
+
     box.appendChild(row);
   });
 }
@@ -162,7 +301,7 @@ function renderPodium(list) {
   detail.innerHTML = "";
 
   if (!list.length) {
-    box.innerHTML = `<p class="hint">Aucun prof classé pour l'instant.</p>`;
+    box.innerHTML = `<p class="hint">Aucun prof classé pour ces filtres.</p>`;
     return;
   }
 
@@ -207,6 +346,12 @@ function showDetail(list, idx) {
       `<div class="detail-cell"><span class="detail-num">${raw}%</span><span class="detail-lbl">score brut</span></div>` +
       `<div class="detail-cell"><span class="detail-num">${s.count}</span><span class="detail-lbl">classé par ${s.count > 1 ? "personnes" : "personne"}</span></div>` +
     `</div>`;
+  if (onProfClick) {
+    const head = detail.querySelector(".detail-name");
+    head.classList.add("stat-clickable");
+    head.onclick = () => onProfClick(s);
+    head.title = "Voir la fiche et les commentaires";
+  }
 }
 
 // ============================================================

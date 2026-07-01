@@ -2,14 +2,18 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState, getState, setDisplayName } from "./store.js?v=6";
-import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=6";
-import { renderApp } from "./tierlist.js?v=8";
-import { initAdmin, renderAdmin } from "./admin.js?v=6";
-import { initGallery } from "./galerie.js?v=6";
-import { initStats } from "./stats.js?v=11";
-import { initSuggestions } from "./propositions.js?v=8";
-import { applyTheme } from "./theme.js?v=6";
+import { initStore, onState, getState, setDisplayName } from "./store.js?v=14";
+import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=14";
+import { renderApp } from "./tierlist.js?v=14";
+import { initAdmin, renderAdmin } from "./admin.js?v=14";
+import { initGallery } from "./galerie.js?v=14";
+import { initStats } from "./stats.js?v=14";
+import { initSuggestions } from "./propositions.js?v=14";
+import { applyTheme } from "./theme.js?v=14";
+import { loadCatalog } from "./catalog.js?v=14";
+import {
+  initProfile, getProfile, initOnboarding, openOnboarding, identityLabel
+} from "./profile.js?v=14";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
@@ -36,6 +40,15 @@ watchAuth(
     if (!storeReady) {
       await initStore(user);
       storeReady = true;
+      // Profil (filière / orientation / follows) + catalogue partagé.
+      // Première visite sans filière → onboarding.
+      try {
+        await loadCatalog();
+        const profile = await initProfile(user, getState().displayName);
+        if (!profile.filiereId) openOnboarding();
+      } catch (e) {
+        console.error("Profil / catalogue :", e);
+      }
     }
   },
   () => {
@@ -80,7 +93,19 @@ const profileMsg    = document.getElementById("profileMsg");
 document.getElementById("openProfileBtn").addEventListener("click", () => {
   profileMsg.textContent = "";
   profilePseudo.value = getState().displayName || "";
+  document.getElementById("profileFiliere").textContent = identityLabel();
   profileModal.classList.add("open");
+});
+
+// Changer de filière / orientation depuis le profil
+document.getElementById("changeFiliereBtn").addEventListener("click", () => {
+  profileModal.classList.remove("open");
+  openOnboarding();
+});
+
+initOnboarding(() => {
+  // Rafraîchit l'étiquette si la modale profil est rouverte ensuite
+  document.getElementById("profileFiliere").textContent = identityLabel();
 });
 document.getElementById("closeProfileBtn").addEventListener("click", () => {
   profileModal.classList.remove("open");

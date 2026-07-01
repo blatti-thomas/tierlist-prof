@@ -1,21 +1,42 @@
 rules_version = '2';
 
 // ============================================================
-//  RÈGLES DE SÉCURITÉ FIRESTORE — Une tier list par utilisateur
+//  RÈGLES DE SÉCURITÉ FIRESTORE
 //  À copier-coller dans : Console Firebase → Firestore Database
 //  → onglet "Règles" (Rules) → Publier.
 //
-//  boards/{uid} : la tier list complète d'un utilisateur
-//    - LECTURE : tous les connectés (pour la galerie commune)
-//    - ÉCRITURE : uniquement le propriétaire (uid == son compte)
+//  boards/{uid}  : la tier list complète d'un utilisateur
+//    - LECTURE : tous les connectés (galerie commune)
+//    - ÉCRITURE : uniquement le propriétaire
+//
+//  users/{uid}   : profil public léger (pseudo, filière, orientation,
+//                  liste des personnes suivies)
+//    - LECTURE : tous les connectés (filtres des stats, galerie)
+//    - ÉCRITURE : uniquement le propriétaire
+//
+//  catalog/main  : catalogue partagé (filières, orientations,
+//                  branches canoniques + correspondances)
+//    - LECTURE / ÉCRITURE : tous les connectés (communauté de
+//      confiance — même modèle collaboratif que les propositions)
 // ============================================================
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function authed() { return request.auth != null; }
+    function isOwner(userId) { return authed() && request.auth.uid == userId; }
+
     match /boards/{userId} {
-      allow read: if request.auth != null;
-      allow create, update, delete: if request.auth != null
-                                    && request.auth.uid == userId;
+      allow read: if authed();
+      allow create, update, delete: if isOwner(userId);
+    }
+
+    match /users/{userId} {
+      allow read: if authed();
+      allow create, update, delete: if isOwner(userId);
+    }
+
+    match /catalog/{docId} {
+      allow read, write: if authed();
     }
 
     // Tout le reste est verrouillé

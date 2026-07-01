@@ -3,14 +3,16 @@
 //  CRUD profs / branches / rangs + apparence
 // ============================================================
 
-import { getState, commitBoard, uid } from "./store.js?v=6";
-import { escapeHtml, randomColor, icon } from "./util.js?v=6";
-import { initThemeControls, renderThemeControls } from "./theme.js?v=6";
+import { getState, commitBoard, uid } from "./store.js?v=14";
+import { escapeHtml, randomColor, icon } from "./util.js?v=14";
+import { initThemeControls, renderThemeControls } from "./theme.js?v=14";
+import { initCatalogAdmin, renderCatalogAdmin } from "./catalog.js?v=14";
 
 export function initAdmin() {
   document.getElementById("openAdminBtn").onclick = openAdmin;
   document.getElementById("closeAdminBtn").onclick = closeAdmin;
   initThemeControls();
+  initCatalogAdmin();
   initAccordion();
 
   document.getElementById("addProfBtn").onclick = () => {
@@ -62,6 +64,8 @@ export function renderAdmin() {
   renderRankAdmin(board);
   populateNewProfBranch(board);
   renderThemeControls(board);
+  // Catalogue partagé (asynchrone : Firestore) — indépendant du board
+  renderCatalogAdmin().catch(e => console.error("Catalogue :", e));
 }
 
 // ---------- Professeurs ----------

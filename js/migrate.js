@@ -3,12 +3,12 @@
 //  Copie config/main + rankings/{uid}  ->  boards/{uid}
 // ============================================================
 
-import { auth, db } from "./firebase-config.js?v=6";
+import { auth, db } from "./firebase-config.js?v=14";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   collection, getDocs, getDoc, doc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { DEFAULT_BOARD } from "./store.js?v=6";
+import { DEFAULT_BOARD } from "./store.js?v=14";
 
 const statusEl = document.getElementById("status");
 const logEl = document.getElementById("log");

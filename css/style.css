@@ -941,3 +941,61 @@ body {
   margin-bottom: 10px;
 }
 .gallery-head h3 { margin-bottom: 2px; }
+
+/* ============================================================
+   MINI-JEUX (bloc 3)
+   ============================================================ */
+
+.game-area { display: flex; flex-direction: column; gap: 14px; }
+
+/* ---------- Cartes de choix du jeu ---------- */
+.game-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.game-icon { font-size: 2.4rem; color: var(--primary); flex: 0 0 auto; }
+.game-info { flex: 1; min-width: 0; }
+.game-info h3 { font-size: 1.1rem; margin-bottom: 4px; }
+.game-info p { font-size: .88rem; font-weight: 500; opacity: .75; }
+.game-info .hint { margin-top: 4px; }
+
+/* ---------- Déroulement du quiz ---------- */
+.quiz-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: .9rem;
+  opacity: .8;
+}
+.quiz-score { color: var(--primary); font-weight: 700; opacity: 1; }
+.quiz-question { font-size: 1.25rem; font-weight: 700; }
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.quiz-option { padding: 14px 12px; font-size: 1rem; }
+.quiz-option:disabled { opacity: .8; }
+.quiz-option.quiz-good { background: var(--green); color: #fff; opacity: 1; }
+.quiz-option.quiz-bad  { background: #ff4d4d; color: #fff; opacity: 1; }
+.quiz-feedback { font-weight: 600; font-size: .95rem; }
+.quiz-fb-good { color: #2f9e44; }
+.quiz-fb-bad  { color: #e03131; }
+
+/* ---------- Fin de partie ---------- */
+.quiz-end { text-align: center; padding: 12px 0 0; }
+.quiz-end-icon { font-size: 3.4rem; color: #ffba08; }
+.quiz-end h3 { font-size: 1.3rem; margin: 6px 0; }
+.quiz-end-score { font-size: 2rem; font-weight: 700; color: var(--primary); }
+.quiz-end-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Leaderboard : ma ligne mise en avant ---------- */
+.score-me { background: #fff3b0; }

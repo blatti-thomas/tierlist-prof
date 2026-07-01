@@ -30,6 +30,10 @@ rules_version = '2';
 //
 //  reactions/{key} : réactions rapides sur un prof { emoji: [uid] }
 //  activity/{id}   : fil d'activité, append-only (pas de modif/suppr.)
+//
+//  scores/{uid}    : leaderboard des mini-jeux (distinct des profs)
+//    - ÉCRITURE : propriétaire, types vérifiés. Limite assumée : le
+//      score est calculé côté client (pas de serveur de jeu).
 // ============================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -77,6 +81,15 @@ service cloud.firestore {
 
     match /reactions/{key} {
       allow read, write: if authed();
+    }
+
+    match /scores/{userId} {
+      allow read: if authed();
+      allow create, update: if isOwner(userId)
+        && request.resource.data.best is number
+        && request.resource.data.total is number
+        && request.resource.data.games is number;
+      allow delete: if isOwner(userId);
     }
 
     match /activity/{id} {

@@ -16,6 +16,7 @@ import {
 } from "./profile.js?v=14";
 import { initComments, openProf } from "./comments.js?v=14";
 import { initSocial, logBoardActivity, refreshFeedBadge } from "./social.js?v=14";
+import { initGames } from "./games.js?v=14";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
@@ -160,6 +161,7 @@ initStats();
 initSuggestions();
 initComments();
 initSocial();
+initGames();
 
 // Clic sur une ligne des stats → fiche du prof (commentaires, réactions)
 setProfClickHandler(openProf);

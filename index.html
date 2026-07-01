@@ -54,6 +54,9 @@
           <span class="material-symbols-rounded">notifications</span> Fil
           <span id="feedBadge" class="badge hidden"></span>
         </button>
+        <button id="openGamesBtn" class="btn btn-ghost">
+          <span class="material-symbols-rounded">sports_esports</span> Jeux
+        </button>
         <button id="openAdminBtn" class="btn btn-accent">
           <span class="material-symbols-rounded">tune</span> Ma tier list
         </button>
@@ -378,6 +381,29 @@
         <div class="admin-col">
           <h3><span class="material-symbols-rounded">military_tech</span> Catégories proposées</h3>
           <div id="propRanks" class="prop-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE MINI-JEUX ============ -->
+  <div id="gamesModal" class="modal">
+    <div class="modal-card modal-card-md">
+      <div class="modal-head">
+        <h2><span class="material-symbols-rounded">sports_esports</span> Mini-jeux</h2>
+        <button id="closeGamesBtn" class="btn btn-ghost btn-sm"><span class="material-symbols-rounded">close</span></button>
+      </div>
+      <div class="modal-body modal-body-block">
+        <nav id="gamesTabs" class="tabs">
+          <button class="tab tab-active" data-tab="jouer"><span class="material-symbols-rounded">play_arrow</span> Jouer</button>
+          <button class="tab" data-tab="scores"><span class="material-symbols-rounded">leaderboard</span> Classement</button>
+        </nav>
+        <div class="tab-panel tab-panel-active" data-panel="jouer">
+          <div id="gameArea" class="game-area"></div>
+        </div>
+        <div class="tab-panel" data-panel="scores">
+          <p class="hint">Classement des mini-jeux — rien à voir avec celui des profs 😄 Reviens jouer pour défendre ta place !</p>
+          <div id="gamesBoard" class="stats-content"></div>
         </div>
       </div>
     </div>

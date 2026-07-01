@@ -2,21 +2,21 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState, getState, setDisplayName, setSaveListener } from "./store.js?v=15";
-import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=15";
-import { renderApp } from "./tierlist.js?v=15";
-import { initAdmin, renderAdmin } from "./admin.js?v=15";
-import { initGallery } from "./galerie.js?v=15";
-import { initStats, setProfClickHandler } from "./stats.js?v=15";
-import { initSuggestions } from "./propositions.js?v=15";
-import { applyTheme } from "./theme.js?v=15";
-import { loadCatalog } from "./catalog.js?v=15";
+import { initStore, onState, getState, setDisplayName, setSaveListener } from "./store.js?v=16";
+import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=16";
+import { renderApp } from "./tierlist.js?v=16";
+import { initAdmin, renderAdmin } from "./admin.js?v=16";
+import { initGallery } from "./galerie.js?v=16";
+import { initStats, setProfClickHandler } from "./stats.js?v=16";
+import { initSuggestions } from "./propositions.js?v=16";
+import { applyTheme } from "./theme.js?v=16";
+import { loadCatalog } from "./catalog.js?v=16";
 import {
   initProfile, getProfile, initOnboarding, openOnboarding, identityLabel
-} from "./profile.js?v=15";
-import { initComments, openProf } from "./comments.js?v=15";
-import { initSocial, logBoardActivity, refreshFeedBadge } from "./social.js?v=15";
-import { initGames } from "./games.js?v=15";
+} from "./profile.js?v=16";
+import { initComments, openProf } from "./comments.js?v=16";
+import { initSocial, logBoardActivity, refreshFeedBadge } from "./social.js?v=16";
+import { initGames } from "./games.js?v=16";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");

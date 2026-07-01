@@ -5,8 +5,8 @@
 //  propose ce qui manque dans le tien ; tu acceptes en 1 clic.
 // ============================================================
 
-import { getState, commitBoard, loadAllBoards, uid } from "./store.js?v=15";
-import { escapeHtml, icon } from "./util.js?v=15";
+import { getState, commitBoard, loadAllBoards, uid } from "./store.js?v=16";
+import { escapeHtml, icon } from "./util.js?v=16";
 
 let lastBoards = [];
 
@@ -43,6 +43,12 @@ function render() {
   const myBranches = new Set(board.branches.map(b => norm(b.name)));
   const myRanks    = new Set(board.ranks.map(r => norm(r.label)));
 
+  // Propositions refusées : masquées pour ce compte (stockées dans le board)
+  const dis = board.dismissed || { profs: [], branches: [], ranks: [] };
+  const disProfs    = new Set(dis.profs || []);
+  const disBranches = new Set(dis.branches || []);
+  const disRanks    = new Set(dis.ranks || []);
+
   const profMap = new Map();   // -> { name, branchName, by:Set }
   const branchMap = new Map(); // -> { name, by:Set }
   const rankMap = new Map();   // -> { label, color, by:Set }
@@ -54,7 +60,7 @@ function render() {
 
     (bd.professors || []).forEach(p => {
       const k = norm(p.name);
-      if (!p.name || myProfs.has(k)) return;
+      if (!p.name || myProfs.has(k) || disProfs.has(k)) return;
       const br = branches.find(b => b.id === p.branchId);
       const cur = profMap.get(k) || { name: p.name.trim(), branchName: br ? br.name : "", by: new Set() };
       cur.by.add(who);
@@ -63,7 +69,7 @@ function render() {
 
     branches.forEach(b => {
       const k = norm(b.name);
-      if (!b.name || myBranches.has(k)) return;
+      if (!b.name || myBranches.has(k) || disBranches.has(k)) return;
       const cur = branchMap.get(k) || { name: b.name.trim(), by: new Set() };
       cur.by.add(who);
       branchMap.set(k, cur);
@@ -71,7 +77,7 @@ function render() {
 
     (bd.ranks || []).forEach(r => {
       const k = norm(r.label);
-      if (!r.label || myRanks.has(k) || DEFAULT_RANK_LABELS.has(k)) return;
+      if (!r.label || myRanks.has(k) || DEFAULT_RANK_LABELS.has(k) || disRanks.has(k)) return;
       const cur = rankMap.get(k) || { label: r.label.trim(), color: r.color || "#cccccc", by: new Set() };
       cur.by.add(who);
       rankMap.set(k, cur);
@@ -135,8 +141,26 @@ function renderSection(containerId, items, type) {
     add.append(document.createTextNode(" Ajouter"));
     add.onclick = () => { addItem(type, it); render(); };
 
-    row.append(info, add);
+    // Refuser : la proposition disparaît définitivement pour CE compte
+    // (persisté dans le board → survit à la déconnexion).
+    const refuse = document.createElement("button");
+    refuse.className = "btn btn-ghost btn-sm prop-refuse";
+    refuse.append(icon("close"));
+    refuse.title = "Refuser : ne plus me proposer cet élément";
+    refuse.onclick = () => { dismissItem(type, it); render(); };
+
+    row.append(info, add, refuse);
     c.appendChild(row);
+  });
+}
+
+// Mémorise le refus (nom normalisé) dans board.dismissed
+function dismissItem(type, it) {
+  const key = type === "prof" ? "profs" : type === "branch" ? "branches" : "ranks";
+  const k = norm(type === "rank" ? it.label : it.name);
+  commitBoard(d => {
+    d.dismissed = { profs: [], branches: [], ranks: [], ...(d.dismissed || {}) };
+    if (!d.dismissed[key].includes(k)) d.dismissed[key].push(k);
   });
 }
 

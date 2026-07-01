@@ -5,7 +5,7 @@
 //  - Tout le monde peut LIRE tous les boards (galerie commune)
 // ============================================================
 
-import { db } from "./firebase-config.js?v=15";
+import { db } from "./firebase-config.js?v=16";
 import {
   doc, getDoc, setDoc, onSnapshot, collection, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -135,7 +135,10 @@ export async function initStore(user) {
       branches:   d.branches   || [],
       ranks:      d.ranks      || [],
       professors: d.professors || [],
-      tiers:      d.tiers || tiersFromPlacements(d.placements)
+      tiers:      d.tiers || tiersFromPlacements(d.placements),
+      // Propositions refusées (noms normalisés) : masquées définitivement
+      // pour CE compte dans l'onglet Propositions.
+      dismissed:  { profs: [], branches: [], ranks: [], ...(d.dismissed || {}) }
     };
     if (d.displayName) state.displayName = d.displayName;
     state.error = null;
@@ -215,6 +218,7 @@ function saveNow() {
     ranks:      state.board.ranks,
     professors: state.board.professors,
     tiers:      state.board.tiers,
+    dismissed:  state.board.dismissed || { profs: [], branches: [], ranks: [] },
     updatedAt:  serverTimestamp()
   }).then(() => { if (saveListener) saveListener(); });
 }

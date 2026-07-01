@@ -1114,3 +1114,65 @@ select.ipt option { font-weight: 500; background: #fff; color: var(--text); }
   .topbar-actions { grid-template-columns: repeat(2, 1fr); }
   .quiz-options { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   GALERIE v2 — liste de personnes + tier list en grand
+   ============================================================ */
+
+/* Le conteneur passe de grille de cartes à liste verticale */
+.gallery-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ---------- Ligne "personne" ---------- */
+.gallery-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.gallery-person:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+.gp-avatar { font-size: 2rem; color: var(--primary); flex: 0 0 auto; }
+.gp-info { flex: 1; min-width: 0; }
+.gp-name { font-weight: 700; font-size: 1.05rem; overflow-wrap: anywhere; }
+.gallery-person .btn { flex: 0 0 auto; white-space: nowrap; }
+
+/* ---------- Vue tier list en grand ---------- */
+.gv-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.gv-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* Étiquettes de profs en lecture seule (pas de drag) */
+.chip-static { cursor: default; touch-action: auto; }
+.chip-static:hover { transform: none; }
+
+/* ---------- Propositions : bouton refuser ---------- */
+.prop-refuse { padding: 6px 8px; flex: 0 0 auto; }
+.prop-refuse:hover { background: #ffe3e3; }
+
+@media (max-width: 560px) {
+  .gallery-person { padding: 8px 10px; gap: 8px; flex-wrap: wrap; }
+  .gp-name { font-size: .95rem; }
+  .gallery-person .btn { font-size: .76rem; padding: 6px 8px; }
+  .gv-title { font-size: 1.05rem; }
+}

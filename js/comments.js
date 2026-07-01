@@ -15,15 +15,15 @@
 //    côté serveur à l'horodatage du commentaire précédent).
 // ============================================================
 
-import { db } from "./firebase-config.js?v=15";
+import { db } from "./firebase-config.js?v=16";
 import {
   doc, collection, query, where, getDocs, getDoc, setDoc, updateDoc, deleteDoc,
   writeBatch, serverTimestamp, arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getState, uid as newId } from "./store.js?v=15";
-import { escapeHtml, icon, relativeTime } from "./util.js?v=15";
-import { norm } from "./catalog.js?v=15";
-import { logActivity } from "./social.js?v=15";
+import { getState, uid as newId } from "./store.js?v=16";
+import { escapeHtml, icon, relativeTime } from "./util.js?v=16";
+import { norm } from "./catalog.js?v=16";
+import { logActivity } from "./social.js?v=16";
 
 // Réactions proposées (clé stockée en base → emoji affiché ; les clés
 // restent en ASCII pour être utilisables dans des chemins de champ Firestore)

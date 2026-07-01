@@ -12,14 +12,14 @@
 //    comme anti-spam (1 commentaire max toutes les 15 s).
 // ============================================================
 
-import { db } from "./firebase-config.js?v=15";
+import { db } from "./firebase-config.js?v=16";
 import {
   doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove,
   collection, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { loadCatalog, getCatalog, saveCatalog, filiereById } from "./catalog.js?v=15";
-import { uid as newId } from "./store.js?v=15";
-import { escapeHtml as esc } from "./util.js?v=15";
+import { loadCatalog, getCatalog, saveCatalog, filiereById } from "./catalog.js?v=16";
+import { uid as newId } from "./store.js?v=16";
+import { escapeHtml as esc } from "./util.js?v=16";
 
 let profile = null;   // profil de l'utilisateur connecté
 let myUid = null;

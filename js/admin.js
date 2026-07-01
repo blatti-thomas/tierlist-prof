@@ -3,10 +3,10 @@
 //  CRUD profs / branches / rangs + apparence
 // ============================================================
 
-import { getState, commitBoard, uid } from "./store.js?v=15";
-import { escapeHtml, randomColor, icon } from "./util.js?v=15";
-import { initThemeControls, renderThemeControls } from "./theme.js?v=15";
-import { initCatalogAdmin, renderCatalogAdmin } from "./catalog.js?v=15";
+import { getState, commitBoard, uid } from "./store.js?v=16";
+import { escapeHtml, randomColor, icon } from "./util.js?v=16";
+import { initThemeControls, renderThemeControls } from "./theme.js?v=16";
+import { initCatalogAdmin, renderCatalogAdmin } from "./catalog.js?v=16";
 
 export function initAdmin() {
   document.getElementById("openAdminBtn").onclick = openAdmin;

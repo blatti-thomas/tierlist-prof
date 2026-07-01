@@ -23,12 +23,12 @@
 //                 inter-filières.
 // ============================================================
 
-import { db } from "./firebase-config.js?v=16";
+import { db } from "./firebase-config.js?v=17";
 import {
   doc, getDoc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { uid } from "./store.js?v=16";
-import { icon } from "./util.js?v=16";
+import { uid } from "./store.js?v=17";
+import { icon } from "./util.js?v=17";
 
 export const norm = (s) => (s || "").trim().toLowerCase();
 

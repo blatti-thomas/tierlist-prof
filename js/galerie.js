@@ -5,10 +5,16 @@
 //  en lecture seule). Bouton "Suivre" sur chaque personne.
 // ============================================================
 
-import { loadAllBoards, getState } from "./store.js?v=16";
-import { escapeHtml, icon } from "./util.js?v=16";
-import { isFollowing, follow, unfollow, loadAllProfiles } from "./profile.js?v=16";
-import { filiereById } from "./catalog.js?v=16";
+import { db } from "./firebase-config.js?v=17";
+import {
+  doc, getDoc, setDoc, arrayUnion, arrayRemove
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { loadAllBoards, getState } from "./store.js?v=17";
+import { escapeHtml, icon } from "./util.js?v=17";
+import { isFollowing, follow, unfollow, loadAllProfiles } from "./profile.js?v=17";
+import { filiereById } from "./catalog.js?v=17";
+import { renderReactionBar } from "./comments.js?v=17";
+import { logActivity } from "./social.js?v=17";
 
 let lastBoards = [];
 let lastProfiles = new Map();
@@ -153,6 +159,14 @@ function renderBoardView(b) {
   if (b.uid !== myUid) head.appendChild(followButton(b.uid));
   box.appendChild(head);
 
+  // Réactions emoji + note (étoiles) sur cette tier list
+  const social = document.createElement("div");
+  social.className = "gv-social";
+  box.appendChild(social);
+  loadBoardSocial(b, social).catch(() => {
+    social.innerHTML = `<p class="hint">Réactions et notes disponibles une fois les nouvelles règles Firestore publiées.</p>`;
+  });
+
   // Rangs (lecture seule, pleine taille)
   const profs = b.professors || [];
   const tiers = b.tiers || {};
@@ -199,4 +213,68 @@ function renderBoardView(b) {
       + unplaced.map(p => p.name).join(", ");
     box.appendChild(hint);
   }
+}
+
+// ------------------------------------------------------------
+//  RÉACTIONS + NOTE sur une tier list
+//  • reactions/{board:<uid>} : { emojiKey: [uid, ...] }
+//  • ratings/{uid} : { <uidVotant>: 1..5 } — un champ par votant,
+//    verrouillé par les règles Firestore (chacun ne modifie que
+//    SA note). Moyenne calculée côté client.
+// ------------------------------------------------------------
+async function loadBoardSocial(b, container) {
+  const { uid: myUid } = getState();
+  const reactRef  = doc(db, "reactions", "board:" + b.uid);
+  const ratingRef = doc(db, "ratings", b.uid);
+
+  const [rSnap, gSnap] = await Promise.all([getDoc(reactRef), getDoc(ratingRef)]);
+  container.innerHTML = "";
+
+  // --- Réactions emoji ---
+  const reactBar = document.createElement("div");
+  reactBar.className = "react-bar";
+  renderReactionBar(reactBar, rSnap.exists() ? rSnap.data() : {}, async (key, mine) => {
+    await setDoc(reactRef, { [key]: mine ? arrayRemove(myUid) : arrayUnion(myUid) }, { merge: true });
+    await loadBoardSocial(b, container);
+  });
+
+  // --- Note en étoiles ---
+  const data = gSnap.exists() ? gSnap.data() : {};
+  const votes = Object.values(data).filter(v => typeof v === "number");
+  const avg = votes.length ? votes.reduce((a, v) => a + v, 0) / votes.length : 0;
+  const mine = typeof data[myUid] === "number" ? data[myUid] : 0;
+
+  const rating = document.createElement("div");
+  rating.className = "gv-rating";
+
+  const stars = document.createElement("div");
+  stars.className = "stars";
+  const shown = mine || Math.round(avg);   // ma note, sinon la moyenne
+  for (let i = 1; i <= 5; i++) {
+    const s = document.createElement("button");
+    s.type = "button";
+    s.className = "star-btn" + (i <= shown ? " star-on" : "");
+    s.textContent = "★";
+    if (b.uid === myUid) {
+      s.disabled = true;
+      s.title = "On ne note pas sa propre tier list 😉";
+    } else {
+      s.title = `Noter ${i}/5`;
+      s.onclick = async () => {
+        await setDoc(ratingRef, { [myUid]: i }, { merge: true });
+        logActivity("board", `a noté la tier list de ${b.displayName || "quelqu'un"} ${i}/5`);
+        await loadBoardSocial(b, container);
+      };
+    }
+    stars.appendChild(s);
+  }
+
+  const label = document.createElement("span");
+  label.className = "stars-avg";
+  label.textContent = votes.length
+    ? `${avg.toFixed(1)}/5 (${votes.length} note${votes.length > 1 ? "s" : ""})` + (mine ? ` · ta note : ${mine}` : "")
+    : "Pas encore de note";
+
+  rating.append(stars, label);
+  container.append(reactBar, rating);
 }

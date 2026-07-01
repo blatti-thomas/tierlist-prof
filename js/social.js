@@ -12,14 +12,14 @@
 //  • Badge "nouveautés" : horodatage de dernière lecture en localStorage.
 // ============================================================
 
-import { db } from "./firebase-config.js?v=16";
+import { db } from "./firebase-config.js?v=17";
 import {
   collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getState } from "./store.js?v=16";
-import { getProfile, isFollowing, follow, unfollow, loadAllProfiles } from "./profile.js?v=16";
-import { filiereById } from "./catalog.js?v=16";
-import { escapeHtml, icon, relativeTime } from "./util.js?v=16";
+import { getState } from "./store.js?v=17";
+import { getProfile, isFollowing, follow, unfollow, loadAllProfiles } from "./profile.js?v=17";
+import { filiereById } from "./catalog.js?v=17";
+import { escapeHtml, icon, relativeTime } from "./util.js?v=17";
 
 const TYPE_ICON = { comment: "chat_bubble", board: "format_list_numbered", game: "sports_esports" };
 

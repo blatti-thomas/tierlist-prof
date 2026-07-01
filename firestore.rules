@@ -28,7 +28,11 @@ rules_version = '2';
 //      "reactions" change (réactions emoji des autres).
 //    - SUPPRESSION : l'auteur uniquement.
 //
-//  reactions/{key} : réactions rapides sur un prof { emoji: [uid] }
+//  reactions/{key} : réactions rapides sur un prof ou une tier list
+//                    { emoji: [uid] } (clés "prof:<nom>" / "board:<uid>")
+//  ratings/{uid}   : notes 1..5 sur la tier list d'un utilisateur —
+//    un champ par votant { <uidVotant>: note } ; chacun ne peut
+//    écrire QUE son propre champ (diff().affectedKeys)
 //  activity/{id}   : fil d'activité, append-only (pas de modif/suppr.)
 //
 //  scores/{uid}    : leaderboard des mini-jeux (distinct des profs)
@@ -81,6 +85,24 @@ service cloud.firestore {
 
     match /reactions/{key} {
       allow read, write: if authed();
+    }
+
+    match /ratings/{boardUid} {
+      allow read: if authed();
+      // On ne note pas sa propre tier list, la note vaut 1..5 et on ne
+      // touche qu'à SON champ (clé = uid du votant).
+      allow create: if authed()
+        && request.auth.uid != boardUid
+        && request.resource.data.keys().hasOnly([request.auth.uid])
+        && request.resource.data[request.auth.uid] is number
+        && request.resource.data[request.auth.uid] >= 1
+        && request.resource.data[request.auth.uid] <= 5;
+      allow update: if authed()
+        && request.auth.uid != boardUid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data[request.auth.uid] is number
+        && request.resource.data[request.auth.uid] >= 1
+        && request.resource.data[request.auth.uid] <= 5;
     }
 
     match /scores/{userId} {

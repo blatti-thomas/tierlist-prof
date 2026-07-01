@@ -1176,3 +1176,57 @@ select.ipt option { font-weight: 500; background: #fff; color: var(--text); }
   .gallery-person .btn { font-size: .76rem; padding: 6px 8px; }
   .gv-title { font-size: 1.05rem; }
 }
+
+/* ============================================================
+   NOTES (étoiles) + STATS DE PROFIL
+   ============================================================ */
+
+/* ---------- Barre sociale d'une tier list (galerie) ---------- */
+.gv-social {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  box-shadow: var(--shadow-sm);
+}
+.gv-rating { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Étoiles ---------- */
+.stars { display: flex; gap: 2px; }
+.star-btn {
+  font-family: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: #d9d4c5;
+  padding: 2px;
+  transition: transform .08s ease, color .08s ease;
+  text-shadow: 1px 1px 0 rgba(0,0,0,.15);
+}
+.star-btn:hover { transform: scale(1.25) rotate(-8deg); color: #ffba08; }
+.star-btn:disabled { cursor: default; }
+.star-btn:disabled:hover { transform: none; color: inherit; }
+.star-btn.star-on { color: #ffba08; }
+.star-btn.star-on:disabled:hover { color: #ffba08; }
+.stars-avg { font-weight: 600; font-size: .85rem; opacity: .8; }
+
+/* ---------- Stats du profil ---------- */
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.profile-stats .hint { grid-column: 1 / -1; margin: 0; }
+
+@media (max-width: 560px) {
+  .gv-social { padding: 8px 10px; }
+  .star-btn { font-size: 1.3rem; }
+}

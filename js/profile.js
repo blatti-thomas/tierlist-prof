@@ -12,14 +12,14 @@
 //    comme anti-spam (1 commentaire max toutes les 15 s).
 // ============================================================
 
-import { db } from "./firebase-config.js?v=16";
+import { db } from "./firebase-config.js?v=17";
 import {
   doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove,
   collection, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { loadCatalog, getCatalog, saveCatalog, filiereById } from "./catalog.js?v=16";
-import { uid as newId } from "./store.js?v=16";
-import { escapeHtml as esc } from "./util.js?v=16";
+import { loadCatalog, getCatalog, saveCatalog, filiereById } from "./catalog.js?v=17";
+import { uid as newId } from "./store.js?v=17";
+import { escapeHtml as esc } from "./util.js?v=17";
 
 let profile = null;   // profil de l'utilisateur connecté
 let myUid = null;
@@ -100,6 +100,39 @@ export async function loadAllProfiles() {
   const out = new Map();
   qs.forEach(d => out.set(d.id, { uid: d.id, ...d.data() }));
   return out;
+}
+
+// ------------------------------------------------------------
+//  STATS DU PROFIL — abonnés, réactions reçues, note moyenne
+//  (calculées à la volée : abonnés = profils dont le following
+//  me contient ; likes = réactions sur reactions/board:<moi> ;
+//  note = moyenne des votes de ratings/<moi>)
+// ------------------------------------------------------------
+export async function loadProfileStats() {
+  const [profiles, rSnap, gSnap] = await Promise.all([
+    loadAllProfiles(),
+    getDoc(doc(db, "reactions", "board:" + myUid)),
+    getDoc(doc(db, "ratings", myUid))
+  ]);
+
+  let followers = 0;
+  profiles.forEach(p => { if ((p.following || []).includes(myUid)) followers++; });
+
+  const reactions = rSnap.exists() ? rSnap.data() : {};
+  const likes = Object.values(reactions)
+    .reduce((a, arr) => a + (Array.isArray(arr) ? arr.length : 0), 0);
+
+  const votes = gSnap.exists()
+    ? Object.values(gSnap.data()).filter(v => typeof v === "number") : [];
+  const avg = votes.length ? votes.reduce((a, v) => a + v, 0) / votes.length : null;
+
+  return {
+    followers,
+    following: (profile?.following || []).length,
+    likes,
+    avg,
+    votes: votes.length
+  };
 }
 
 // ============================================================

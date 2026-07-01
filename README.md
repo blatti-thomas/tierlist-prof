@@ -106,7 +106,8 @@ firestore.rules         règles de sécurité Firestore
 | `users/{uid}`     | profil léger : pseudo, filière, orientation, follows           | connectés | propriétaire |
 | `catalog/main`    | filières/orientations + branches canoniques + correspondances  | connectés | connectés (communautaire) |
 | `comments/{id}`   | commentaires sur un prof (+ réactions)                         | connectés | auteur (réactions : tous) |
-| `reactions/{key}` | réactions rapides sur un prof                                  | connectés | connectés |
+| `reactions/{key}` | réactions rapides sur un prof ou une tier list                 | connectés | connectés |
+| `ratings/{uid}`   | notes 1–5 sur la tier list d'un utilisateur (1 champ/votant)   | connectés | votant (son champ uniquement) |
 | `activity/{id}`   | fil d'activité (append-only)                                   | connectés | auteur, sans modif/suppr. |
 | `scores/{uid}`    | leaderboard des mini-jeux                                      | connectés | propriétaire |
 

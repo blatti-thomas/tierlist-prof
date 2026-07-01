@@ -2,21 +2,21 @@
 //  POINT D'ENTRÉE — Orchestration de l'application
 // ============================================================
 
-import { initStore, onState, getState, setDisplayName, setSaveListener } from "./store.js?v=16";
-import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=16";
-import { renderApp } from "./tierlist.js?v=16";
-import { initAdmin, renderAdmin } from "./admin.js?v=16";
-import { initGallery } from "./galerie.js?v=16";
-import { initStats, setProfClickHandler } from "./stats.js?v=16";
-import { initSuggestions } from "./propositions.js?v=16";
-import { applyTheme } from "./theme.js?v=16";
-import { loadCatalog } from "./catalog.js?v=16";
+import { initStore, onState, getState, setDisplayName, setSaveListener } from "./store.js?v=17";
+import { watchAuth, login, register, logout, setProfileName } from "./auth.js?v=17";
+import { renderApp } from "./tierlist.js?v=17";
+import { initAdmin, renderAdmin } from "./admin.js?v=17";
+import { initGallery } from "./galerie.js?v=17";
+import { initStats, setProfClickHandler } from "./stats.js?v=17";
+import { initSuggestions } from "./propositions.js?v=17";
+import { applyTheme } from "./theme.js?v=17";
+import { loadCatalog } from "./catalog.js?v=17";
 import {
-  initProfile, getProfile, initOnboarding, openOnboarding, identityLabel
-} from "./profile.js?v=16";
-import { initComments, openProf } from "./comments.js?v=16";
-import { initSocial, logBoardActivity, refreshFeedBadge } from "./social.js?v=16";
-import { initGames } from "./games.js?v=16";
+  initProfile, getProfile, initOnboarding, openOnboarding, identityLabel, loadProfileStats
+} from "./profile.js?v=17";
+import { initComments, openProf } from "./comments.js?v=17";
+import { initSocial, logBoardActivity, refreshFeedBadge } from "./social.js?v=17";
+import { initGames } from "./games.js?v=17";
 
 const loginScreen = document.getElementById("loginScreen");
 const appScreen   = document.getElementById("appScreen");
@@ -98,8 +98,27 @@ document.getElementById("openProfileBtn").addEventListener("click", () => {
   profileMsg.textContent = "";
   profilePseudo.value = getState().displayName || "";
   document.getElementById("profileFiliere").textContent = identityLabel();
+  renderProfileStats();
   profileModal.classList.add("open");
 });
+
+// Stats sociales du profil (abonnés, abonnements, réactions, note moyenne)
+function renderProfileStats() {
+  const box = document.getElementById("profileStats");
+  box.innerHTML = `<p class="hint">Chargement des stats…</p>`;
+  const cell = (num, lbl) =>
+    `<div class="detail-cell"><span class="detail-num">${num}</span><span class="detail-lbl">${lbl}</span></div>`;
+  loadProfileStats().then(s => {
+    box.innerHTML =
+      cell(s.followers, "abonné·e·s") +
+      cell(s.following, "abonnements") +
+      cell(s.likes, "réactions reçues") +
+      cell(s.avg != null ? s.avg.toFixed(1) + "/5" : "—",
+           s.votes ? `note moyenne (${s.votes} vote${s.votes > 1 ? "s" : ""})` : "note moyenne");
+  }).catch(() => {
+    box.innerHTML = `<p class="hint">Stats disponibles une fois les nouvelles règles Firestore publiées.</p>`;
+  });
+}
 
 // Changer de filière / orientation depuis le profil
 document.getElementById("changeFiliereBtn").addEventListener("click", () => {

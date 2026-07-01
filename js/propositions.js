@@ -5,8 +5,8 @@
 //  propose ce qui manque dans le tien ; tu acceptes en 1 clic.
 // ============================================================
 
-import { getState, commitBoard, loadAllBoards, uid } from "./store.js?v=16";
-import { escapeHtml, icon } from "./util.js?v=16";
+import { getState, commitBoard, loadAllBoards, uid } from "./store.js?v=17";
+import { escapeHtml, icon } from "./util.js?v=17";
 
 let lastBoards = [];
 

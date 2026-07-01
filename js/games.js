@@ -17,15 +17,15 @@
 //  les règles Firestore ne peuvent que vérifier le type/propriétaire.
 // ============================================================
 
-import { db } from "./firebase-config.js?v=16";
+import { db } from "./firebase-config.js?v=17";
 import {
   doc, getDoc, setDoc, collection, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getState, loadAllBoards } from "./store.js?v=16";
-import { computeStats } from "./stats.js?v=16";
-import { escapeHtml } from "./util.js?v=16";
-import { norm } from "./catalog.js?v=16";
-import { logActivity } from "./social.js?v=16";
+import { getState, loadAllBoards } from "./store.js?v=17";
+import { computeStats } from "./stats.js?v=17";
+import { escapeHtml } from "./util.js?v=17";
+import { norm } from "./catalog.js?v=17";
+import { logActivity } from "./social.js?v=17";
 
 const QUESTIONS_PER_RUN = 8;
 const POINTS_PER_GOOD = 10;

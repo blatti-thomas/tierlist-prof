@@ -21,12 +21,12 @@
 //   • nuage 2D — popularité (votes) vs note (score)
 // ============================================================
 
-import { loadAllBoards } from "./store.js?v=16";
-import { escapeHtml } from "./util.js?v=16";
+import { loadAllBoards } from "./store.js?v=17";
+import { escapeHtml } from "./util.js?v=17";
 import {
   loadCatalog, getCatalog, norm, subjectForBranchName, isSubjectInFiliere, subjectsOfFiliere
-} from "./catalog.js?v=16";
-import { getProfile, loadAllProfiles } from "./profile.js?v=16";
+} from "./catalog.js?v=17";
+import { getProfile, loadAllProfiles } from "./profile.js?v=17";
 
 // Instances Chart.js en cours, à détruire avant un nouveau rendu
 let charts = [];
